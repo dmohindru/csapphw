@@ -5,20 +5,24 @@
 /*
 Bitwise algorithms
 https://www.geeksforgeeks.org/bitwise-algorithms/
+Bit twiddling hacks
+http://graphics.stanford.edu/~seander/bithacks.html
  */
 int odd_ones(unsigned x)
 {
   //At most 12 arthmatic, logical and bitwise operations
+  /*explanation of the below logic
+   * https://stackoverflow.com/questions/19373034/how-to-judge-if-there-is-even-1s-in-a-numbers-binary-representation-using-c
+   */
+  /* I feel this problem is about parity checking and basic idea behind parity checking is to 
+   * xor each bit of a number with other other bits. If there are even number of 1s present
+   * then resulting xor will be 0, otherwise if odd resulting xor will be 1.
+   */
   x ^= x >> 16;
-  //printf("value of x after xor: %X\n", x);
   x ^= x >> 8;
-  //printf("value of x after xor: %X\n", x);
   x ^= x >> 4;
-  //printf("value of x after xor: %X\n", x);
   x ^= x >> 2;
-  //printf("value of x after xor: %X\n", x);
   x ^= x >> 1;
-  //printf("value of x after xor: %X\n", x);
   x &= 0x1;
   return x;
   

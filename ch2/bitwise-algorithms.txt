@@ -1,2 +1,4 @@
 Bitwise algorithms
 https://www.geeksforgeeks.org/bitwise-algorithms/
+Bit Hack algorithms
+http://graphics.stanford.edu/~seander/bithacks.html
