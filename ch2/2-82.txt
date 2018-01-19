@@ -1,0 +1,55 @@
+/* Create some arbitrary values */
+
+int x = random();
+int y = random();
+
+/* Convert to unsigned */
+
+unsigned ux = (unsigned) x;
+unsigned uy = (unsigned) y;
+
+Excercise
+A: (x < y) == (-x > -y)
+Answer: No alway true.
+e.g
+1. if x = 2 and y = 1, then x < y evaluates to 0, and -x > -y also
+   evaluates to 0. Its only true with x is less than y like x = 1, y = 3
+   or x = -10 and y = -5 etc 
+
+B: ((x+y)<<4) + y - x == 17 * y + 15 * x
+Answer: Yes always true
+Explanation
+17 = 0b10001
+15 = 0b1111
+Expression ((x+y)<<4) + y - x can be regrouped as
+((x << 4) - x) + ((y << 4) + y) 
+which is equivalent to x * 15 + y * 17
+
+C: ~x + ~y + 1 ==  ~(x + y)
+Answer: Yes alway true
+Explanation: Assymetric representation of positive and negetive number
+in two's complement representation.
+~1 = -2 or in other words -1 = ~1 + 1
+
+D: (ux - uy) == -(unsigned) (y - x)
+Answer: Yes alway true
+Explanation: 
+LHS: (ux - uy)
+RHS: -(unsigned) (y -x)
+abrobing -ve sign in brackets
+(unsigned) (x - y)
+hence: (ux - uy) == (unsigned) (x - y)
+
+E: ((x >> 2) << 2) <= x
+Answer: Yes always true
+Explanation:
+5 (0b101) >> 2  = (0b001)
+(0b001) << 2 = (0b100) = 4 and hence 4 <= 5
+-------
+6 (0b110) >> 2  = (0b001)
+(0b001) << 2 = (0b100) = 4 and hence 4 <= 6
+-------
+4 (0b100) >> 2  = (0b001)
+(0b001) << 2 = (0b100) = 4 and hence 4 <= 4
+
+ 
