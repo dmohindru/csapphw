@@ -1,0 +1,26 @@
+A: 7.0
+-------
+7.0 = 0b111.00
+E = 2, e = bais + E = bais + 2
+M = 1.11, f = 0.11
+Sign Bit s = 0 (for +ve)
+e = 2^(k-1) - 1 + 2
+formaula as V = M * 2^E
+Bit Representation for 32bit format as under
+s = 0 
+e = bais + E = 127 + 2 = 129 = 0b1000 0001
+f = 110 0000 0000 0000 0000 0000
+0 1000 0001 110 0000 0000 0000 0000 0000
+- --------- ----------------------------
+s     e               f
+
+B: The Largest odd number than can be represented
+binary representation
+s = 0
+e = 1111 1110
+f = 111 1111 1111 1111 1111 1111 
+0 1111 1110 111 1111 1111 1111 1111 1111
+- --------- ----------------------------
+s     e              f
+C: The reciprocal of the smallest positive normalized value
+Did not understood this question need to work on it

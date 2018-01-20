@@ -1,0 +1,12 @@
+INTEL Floating point representation
+sign bit(1 bit), exponent (15 bits), integer bit (1 bit), fraction (63 bits)
+Total: 1 + 15 + 1 + 63 = 80 
+A: Smallest positive denormalized value
+0 0000 0000 0000 0000 000 0 00...........1
+
+B: Smallest positive normalized
+0 0000 0000 0000 0000 001 1 00...........0
+
+C: Largest normalized
+0 1111 1111 1111 1111 110 1 11...........1
+
