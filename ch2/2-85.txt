@@ -13,6 +13,11 @@ f = 110 0000 0000 0000 0000 0000
 0 1000 0001 110 0000 0000 0000 0000 0000
 - --------- ----------------------------
 s     e               f
+reverse calculating its value
+V = 2^E * M
+E = e - bais = 0b1000 0001 - 127 = 129 - 127 = 2
+M = 1 + 1/2 + 1/4 = 4/4 + 2/4 + 1/4 = 7/4
+V = 7/4 * 2^2 = 7/4 * 4 = 7
 
 B: The Largest odd number than can be represented
 binary representation
@@ -22,5 +27,89 @@ f = 111 1111 1111 1111 1111 1111
 0 1111 1110 111 1111 1111 1111 1111 1111
 - --------- ----------------------------
 s     e              f
+reverse calculating its value
+s = 0
+E = e - bais = 1111 1110 - 127 = 254 - 127 = 127
+M = 1.111 1111 1111 1111 1111 1111 = 16777215/8388608
+V = 16777215/8388608 * 2^127 = 16777215/8388608 * 1.701411835×10³⁸
+V = 3.402823466×10³⁸ (pretty large number)
+doing this excercise with 8 bit format
+0 1110 111
+- ---- ---
+s  e    f
+s = 0
+E = e - bais = 14 - 7 = 7
+M = 1 + 1/2 + 1/4 + 1/8 = 15/8
+V = M * 2^E = 15/8*128 = 15 * 16 = 240 (wrong?)
+-------
+Another try
+for odd number
+s = 0
+e = bais + n = 7 + 3 (this one is misterious?)
+f = 111
+E = 3
+V = M * 2^E = 15/8 * 2^E = 15/8 * 8 = 15 (correct)
+------
+A bit of explanation
+For odd number all of fraction bits should be 1
+eg. 111 or 1111 or 11111
+this would generate M for normalized number as
+ 111 = 15/8
+ 1111 = 31/16
+ 11111 = 63/32
+ for a number to be odd we need to cancel out denominators
+ 8 or 16 or 32 
+ equivalently 2^3 or 2^4 or 2^5
+ so E = 3 or 4 or 5
+ because for V = M * 2^E
+ for 111: 15/2^3 * 2^3 = 15
+ for 1111: 31/2^4 * 2^4 = 31
+ for 11111: 63/2^5 * 2^5 = 63
+ so e = Bais + E = Bais + n
+ so bit pattern as
+ 0 Bais+n 111..1(n times)
+ 
+
 C: The reciprocal of the smallest positive normalized value
-Did not understood this question need to work on it
+smallest positive normalized value
+s = 0
+e = 0000 0001
+f = 000 0000 0000 0000 0000 0000
+0 0000 0001 000 0000 0000 0000 0000 0000 
+- --------- ----------------------------
+s     e              f
+
+so reciprocal of smallest positive value normalized would be 
+largest positive normalized value
+s = 0
+e = 1111 1110
+f = 111 1111 1111 1111 1111 1111
+0 1111 1110 111 1111 1111 1111 1111 1111
+- --------- ----------------------------
+s     e              f
+
+doing this excercise with 8 bit representation
+smallest normalized value
+0 0001 0000
+s = 0
+E = e - bais = 0001 -7 = 1 - 7 = -6
+M = 1 + f = 1 + 0 = 1
+V = 1 * 2^-6 = 1/64 = 0.015625
+Hence reciprocal of this number is 64.00, converting it in 
+floatin point representation as
+100 0000.0000 0000
+for the form 1.xxxxx i.e. 1.000
+s = +ve = 0
+E = 6
+e = E + bais = 6 + 7 = 13 = 0b1101
+f = 000
+there for its repesentation
+0 1101 000
+- ---- ---
+s  e    f
+(solution: 0 1101 000)
+s = 0
+E = e - bais = 13 - 7 = 6
+M = 1 + f = 1 + 0 = 1
+V = M * 2^E = 1 * 2^6 = 64 (yes its correct)
+
