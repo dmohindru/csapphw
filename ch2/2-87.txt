@@ -6,6 +6,7 @@ S = 1 bit
 e = 5 bits
 f = 10 bits
 bais = 2^(5-1) - 1 = 15
+------------------------------------------------------------------------
 eg. no: 7/8 other way of think is binary 7 with floating point number
 shifted 3 places to left 8 = 2^3 or 1/8 = 2^-3
 7/8 = 111/2^3 = 0.111 = 1.11 * 2^-1
@@ -20,9 +21,9 @@ binary repsentation
 s   e       f
 numeric value = 0.875
 
-
+------------------------------------------------------------------------
 Description               Hex       M       E       V       D
--------------------------------------------------------------
+------------------------------------------------------------------------
 -0                                                  -0      -0.0
 
 Smallest Value > 2
@@ -35,3 +36,42 @@ Largest denormalized
 
 Number with Hex
 reprentation 2BB0
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+Another example using 32 bit format for practice
+7.875
+binary representation
+0 1000 0001 111 1100 0000 0000 0000 0000
+another was of writing 7.875 = 7 + 0.875
+= 7 + 7/8 = 63/8 = 111.111 
+means: binary representation of 63 (0b111111) and divded by 8 means
+moving floating point three position to left 2^3 = 8.
+Now 111.111 can be written as 1.11111 * 2^2
+Hence 
+E = 2
+e = bais + E = 127 + 2 = 129 = 0b1000 0001
+M = 1.111 1100 0000 0000 0000 0000
+f = 111 1100 0000 0000 0000 0000
+s = 0 (+ve number)
+encoding
+0 1000 0001 111 1100 0000 0000 0000 0000
+- --------- ----------------------------
+s   e                 f
+basic idea about convertion of floating point number
+1. is write any decimal floating point number of form
+   xx.xxx = numerator/denominator
+   where denominator a number of some power of 2 e.g 2, 4, 8, 16, ......
+2. convert numerator in binary form
+3. move floating point number to left as per the power of two of
+   denominator. e.g. for 2 move 1 point to left, for 4 = 2^2 move two
+   point to left, for 8 = 2^3 move three point to left
+4. Then write binary converted number in form x.xxxx * 2^E
+5. Calculate e = bais + E
+6. f = .xxxx
+7. s = 0 for +ve, 1 for -ve
+8. Hence format becomes s eeee eeee fff ffff ffff ffff ffff ffff
+Nice article on conversion from decimal float to binary float
+http://sandbox.mc.edu/~bennet/cs110/flt/dtof.html
