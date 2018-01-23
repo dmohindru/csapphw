@@ -1,0 +1,118 @@
+For Solution See
+https://zhangjunphy.github.io/csapp/chap2.html
+question 2.87
+
+Format A
+---------
+sign      = 1 bit
+exponent  = 5 bits
+fraction  = 3 bits
+bais      = 15
+s eeeee fff
+- ----- ---
+Format B
+--------
+sign      = 1 bit
+exponent  = 4 bits
+fraction  = 4 bits
+bais      = 7
+s eeee ffff
+- ---- ----
+==========================
+A: 1 01111 001 (Format A)
+Value
+E = e - bais = 15 - 15 = 0
+M = 1 + (1/8) = 9/8
+s = 1 (-ve)
+V = -9/8 * 2^0 = -9/8 ---->
+Converting to format B
+-9/8
+s = 1 (for -ve)
+9/8 = 1.001
+Normalized = 1.001 * 2^0
+E = 0
+e = bais + E = 7 + 0 = 7 = 0b0111
+f = 0010
+Format B: 1 0111 0010 ---->
+Value Format B: -9/8  ---->
+===========================
+B: 0 10110 011 
+Value
+s = 0 (+ve)
+e = 22
+E = e - bais = 22 - 15 = 7
+M = 1 + 1/4 + 1/8 = 8/8 + 2/8 + 1/8 = 11/8
+V = 11/8 * 2^7 = 11 * 2^4 = 11 * 16 = 176 ----> Correct
+Converting 176 to format B
+s = 0 (+ve)
+176 = 0b10110000
+Normalized: 1.0110000 * 2^7
+E = 7
+e = bais + E = 7 + 7 = 14 = 0b1110
+f = 0110
+Format B: 0 1110 0110 ----> Correct 
+Value Format B: = 176 ----> Correct
+=============================
+C: 1 00111 010
+Value
+s = 1 (-ve)
+e = 7
+E = e - bais = 7 - 15 = -8
+M = 1 + 1/4 = 5/4
+V = -5/4 * 2^-8 = -5/1024 ----> Correct
+Converting -5/1024 to format B
+s = 1 (-ve)
+5/1024 = 0b0.0000000101
+Normalized: 1.0 * 2^-8
+E = -8
+e = bais + E = 7 - 8 = -1 (but e cannot be -ve)
+and E can range from (1 - 7) to (14 -7), or (-6 to 7)
+so setting e = 0b0000 since its very small number than Format B can display
+so coverting format B to denormalized number
+which make E = 1 - bais = 1 - 7
+E = -6
+5 = 0b101
+Converting to denormalized 
+M = 0.0101 
+V = -1 * (1/4 + 1/16) * 2^-6= -1 * (4/16 + 1/16) * 2^-6           
+V =  -1 * 5/16 * 2^-6 = -5/1024 ----> correct 
+Format B: 1 0000 0101 ----> correct
+==============================
+D: 0 00000 111
+s = 0 (-ve)
+e = 00000 (its a denormalized number)
+E = 1 - bais = 1 - 15 = -14
+M = (1/2 + 1/4 + 1/8) = 4/8 + 2/8 + 1/8 = 7/8
+V = 7/8 * 2^-14 = 7/2^17 ----> Correct
+Since its a denormalized number which is a very small number and Format B
+already has a smaller exponent range. So it need to be least number that 
+can be represented by Format B
+Format B: 0 0000 0001 ----> correct
+Value
+E = 1 - bais = -6
+M = 1/16
+V = 1/16 * 2^-6 = 1/2^-10 -----> correct
+=============================
+E: 1 11100 000
+s = 1 (-ve)
+e = 28
+E = e - bais = 28 - 15 = 13
+M = 1
+V = -1 * 1 * 2^13 = -2^13 = -8192 ---> Correct
+Converting -8192 into fromat B
+s = 1 (-ve)
+8192 = 0b10000000000000
+Normalized: 1.0000000000000 * 2^-13
+E = -13
+e = bais + E = 7 - 13 = -6 (can't be negetive)
+so most -ve normalized number than can be represented by
+Format B: 1 1110 1111 ----> correct
+s = 1 (-ve)
+e = 14
+E = e - bais = 14 - 7 = 7
+M = 1 + 1/2 + 1/4 + 1/8 + 1/16 = 31/16
+V = -1 * 31/16 * 2^7 = -31 * 2^3 = -248 ----> correct
+=============================
+F: 0 10111 100
+
+

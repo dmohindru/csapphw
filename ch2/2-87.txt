@@ -22,20 +22,20 @@ s   e       f
 numeric value = 0.875
 
 ------------------------------------------------------------------------
-Description               Hex       M               E       V       D
+Description               Hex       M                        E       V         D
 ------------------------------------------------------------------------
--0                        8000      00 0000 0000    -14       -0      -0.0        --correct
+-0                        8000      00 0000 0000 (0)        -14       -0      -0.0            --correct
 
-Smallest Value > 2        3C01      00 0000 0001    1     1025/512  2.001953125   --hex value recheck
+Smallest Value > 2        4001      00 0000 0001(1025/1024)   1     1025/512  2.001953125    --correct
 
-512                       5C00      00 0000 0000    9      512      512.0         --hex value recheck
+512                       6000      00 0000 0000 (1)          9      512      512.0          --correct
 
-Largest denormalized      03FF      11 1111 1111   -13   1023/8388608  0.000121951 --redo again
+Largest denormalized      03FF      11 1111 1111(1023/1024)   -14   1023/2^24  0.000060976   --correct
 
--infinity                 FC00      00 0000 0000   N/A     -inf       -inf         --correct
+-infinity                 FC00      00 0000 0000(0)           N/A     -inf       -inf         --correct
 
-Number with Hex           2BB0      11 0000 0000   -4      7/64       0.109375     -- check for 0X3BB0
-reprentation 2BB0
+Number with Hex           3BB0      11 1011 0000(123/64)      -1     123/128    0.9609375     -- does not matches with solution book, but i believe it correct
+reprentation 3BB0
 ------------------------------------------------------------------------
 Solutions
 ================
@@ -52,15 +52,15 @@ First Binary represention of 2 in 16 bit format
 2.00 = 0b10.0 * 2^0
 Normalized: 1.00 * 2^1
 E = 1
-e = bais + E = 14 + 1 = 15 = 0b01111
+e = bais + E = 15 + 1 = 16 = 0b10000
 f = 00 0000 0000
 s = 0
-0 0 1111 00 0000 0000
+0 1 0000 00 0000 0000
 - ------ ------------
 so binary represenation of number just greater than 2.0 would be
-0 0 1111 00 0000 0001
+0 1 0000 00 0000 0001
 - ------ ------------
-E = e - bais = 15 - 14 = 1
+E = e - bais = 16 - 15 = 1
 M = 1.0000000001
 V = 1.0000000001 * 2^1 = (1 + 1/1024) * 2 = 1025/1024 * 2 = 1025/512
 D = (1 + 1/1024) * 2 = 1025/1024 * 2 = 1025/512 = 2.001953125
@@ -70,22 +70,22 @@ C: 512
 512.0 = 0b1000000000.0
 Normalized = 1.0000000000 * 2^9
 E = 9
-e = bais + E = 14 + 9 = 23 = 0b10111
+e = bais + E = 15 + 9 = 24 = 0b11000
 M = 00 0000 0000
 s = 0 (+ve)
-0 1 0111 00 0000 0000
+0 1 1000 00 0000 0000
 - ------ ------------
 V = 1 * 2^9 = 512
 D = 512.0
-Hex = 5C00
+Hex = 6000
 =================
 D: Largest denormalized number
 binary representation
 0 0 0000 11 1111 1111
-E = 1 - bais = 1 - 14 = -13
+E = 1 - bais = 1 - 15 = -14
 f = 11 1111 1111
-V = 1023/1024 * 2^-13 = 1023/8388608
-D = 0.000121951
+V = 1023/1024 * 2^-14 = 1023/16777216
+D = 0.000060976
 Hex = 03FF
 =================
 E: -infinity
@@ -95,13 +95,14 @@ binary representaton
 E = N/A
 hex = FC00
 =================
-Number with hex: 2BB0
+Number with hex: 3BB0
 binary representation
-0 0 1010 11 0000 0000
+0 0 1110 11 1011 0000
 - ------ ------------
-E = e - bais = 10 - 14 = -4
-V = (1 + 1/2 + 1/4) * 2^-4 = 7/4 * 1/16 = 7/64
-D = 0.109375
+E = e - bais = 14 - 15 = -1
+M = 123/64
+V = 123/64 * 2^-1 = 123/64 * 1/2 = 123/128
+D = 0.9609375
 =================
 ------------------------------------------------------------------------
 Another example using 32 bit format for practice
