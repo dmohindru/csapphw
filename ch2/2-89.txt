@@ -1,0 +1,34 @@
+/* Create some arbitrary values */
+int x = random();
+int y = random();
+int z = random();
+/* Convert to double */
+double dx = (double) x;
+double dy = (double) y;
+double dz = (double) z;
+
+
+A: (float) x == (float) dx 
+  Should yield 1 always. 
+  As converting x from int to float, and converting dx from double to 
+  float should yield same bit patter. More over there is not possiblity
+  of overflow when converting from double dx to float. Because dx was 
+  generated from an int x which lies well within range of float.
+
+B: dx-dy == (double) (x-y) 
+  Should not alway yield 1.
+  Because possibility of over flow in (x-y) operation when x is -ve
+  andy y is INT_MIN
+
+C: (dx + dy) + dz == dx + (dy + dz)
+  Should alway yield 1.
+  Becuase associative nature of addition
+
+D: (dx * dy) * dz == dx * (dy * dz)
+  Should always yield 1.
+  And no chances of overflow as well because dx, dy, dz came from int.
+
+E: dx/dx == dz/dz
+  Should not alway yield 1.
+  Possibility of dx or dz to be zero. So one side would become infinity.
+  

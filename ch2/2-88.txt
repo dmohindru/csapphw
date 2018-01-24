@@ -114,5 +114,19 @@ M = 1 + 1/2 + 1/4 + 1/8 + 1/16 = 31/16
 V = -1 * 31/16 * 2^7 = -31 * 2^3 = -248 ----> correct
 =============================
 F: 0 10111 100
+s = 0 (+ve)
+e = 23
+E = e - bais = 23 -15 = 8
+M = 1 + 1/2 = 3/2
+V = 3/2 * 2^8 = 3 * 2^7 = 348 ---->
+Converting 348 to format B
+348 = 0b101011100
+Normalized: 1.01011100 * 2^8
+E = 8
+e = bais + E = 7 + 8 = 15 (for normal number e can be max 7)
+and all one in e is represention of a infinity
+so Format B: 0 1111 0000  ----> correct
+Value: +00 ----> correct 
+=============================
 
 
