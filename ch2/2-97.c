@@ -90,5 +90,6 @@ int main(int argc, char *argv[])
   printf("%X\n", float_i2f(-9876543));
   printf("%X\n", float_i2f(INT_MIN));
   printf("%X\n", float_i2f(INT_MAX));
+  printf("%X\n", float_i2f(2147483645));
   return 0;
 }
