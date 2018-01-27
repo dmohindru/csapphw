@@ -13,7 +13,7 @@ int leftmost_one(unsigned x)
 
 int main(int argc, char *argv[])
 {
-  printf("%X\n", leftmost_one(0xFF00));
+  printf("%X\n", leftmost_one(0x7F00));
   printf("%X\n", leftmost_one(0x6600));
   return 0;
 }
