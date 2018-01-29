@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <limits.h>
-
+/* Reference to article about int to float conversion
+ * https://locklessinc.com/articles/i2f/
+ * https://github.com/wky/ICS-labs/blob/master/data/bits.c
+ */
 typedef unsigned float_bits;
 /*
  * TODO: check for INT_MAX case
