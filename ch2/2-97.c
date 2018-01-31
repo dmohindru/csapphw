@@ -1,10 +1,20 @@
 #include <stdio.h>
+#include <math.h>
 #include <limits.h>
 /* Reference to article about int to float conversion
  * https://locklessinc.com/articles/i2f/
  * https://github.com/wky/ICS-labs/blob/master/data/bits.c
  */
 typedef unsigned float_bits;
+/* Helper function*/
+unsigned f2u(float f) {
+  return *(unsigned*) &f;
+}
+
+float u2f(unsigned u) {
+  return *(float*) &u;
+}
+
 /*
  * TODO: check for INT_MAX case
  * study round to zero , round to even case
@@ -94,25 +104,21 @@ float_bits float_i2f(int x) {
 }
 int main(int argc, char *argv[])
 {
-  int len;
-  unsigned frac_bit_mask;
-  //len = bit_length(INT_MAX);
-  //frac_bit_mask = frac_mask(len);
-  //printf("%d\n", len);
-  //printf("%X\n", frac_bit_mask);
-  //printf("%d\n", bit_length(-125698));
-  //printf("%d\n", bit_length(-9999));
-  //printf("%d\n", bit_length(INT_MIN)); 0xFFFF0
-  printf("%X\n", float_i2f(1000));
-  printf("%X\n", float_i2f(-1000));
-  printf("%X\n", float_i2f(132678));
-  printf("%X\n", float_i2f(-132678));
-  printf("%X\n", float_i2f(1));
-  printf("%X\n", float_i2f(-1));
-  printf("%X\n", float_i2f(9876543));
-  printf("%X\n", float_i2f(-9876543));
-  printf("%X\n", float_i2f(INT_MIN));
-  printf("%X\n", float_i2f(INT_MAX));
-  printf("%X\n", float_i2f(2147483645));
+  unsigned num, r;
+  float f, num_f;
+  int i, f_i;
+  for (num = 0; num <= 100000; num++)
+  {
+    //printf("Testing for num: %u\n", num);
+    r = rand() % UINT_MAX;
+    num_f = u2f(float_i2f((int)r));
+    f = (float)(int)r;
+    if (f != num_f)
+    {
+      printf("float_i2f failed for value of num: %u\n", num);
+      break;
+    }
+  }
+  
   return 0;
 }

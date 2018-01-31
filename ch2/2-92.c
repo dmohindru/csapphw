@@ -24,13 +24,24 @@ float_bits float_negetive(float_bits f)
 }
 int main(int argc, char *argv[])
 {
-  unsigned f = 0x4640E400;
-  unsigned f_neg = float_negetive(f);
-  //float f_num = u2f(f);
-  //float test_num = -12345.00;
-  float test_num = u2f(0xC640E400);
-  unsigned test_f_neg = f2u(test_num);
-  printf("%d\n", f_neg == test_f_neg);
-  
+  unsigned num, num_neg, f_u, r;
+  float f;
+  int i;
+  for (num = 0; num <= 100000; num++)
+  {
+    //printf("Testing for num: %u\n", num);
+    r = rand() % UINT_MAX;
+    num_neg = float_negetive(r);
+    f = u2f(r);
+    if(isnan(f))
+      f_u = f2u(f);
+    else
+      f_u = f2u(-f); 
+    if (f_u != num_neg)
+    {
+      printf("float_negetive failed for value of num: %u\n", num);
+      break;
+    }
+  }
   return 0;
 }
