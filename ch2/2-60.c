@@ -22,6 +22,5 @@ int main(int argc, char *argv[])
   //printf("%X\n",replace_byte(0x12345678, 0, 0xAB));
   printf("%X\n",val);
   //assert(val == 0x123456AC);
-  
   return 0;
 }
