@@ -1,0 +1,47 @@
+Practice Problem 4:
+
+Figure 10(b) C code for call_proc
+---------------------------------
+int call_proc()
+{
+    int x2 = 2;
+    short x3 = 3; char x4 = 4;
+    proc(x2, &x2, x3, &x3, x4, &x4);
+    return x2*(x3-x4);
+}
+
+When the C code of Figure 10(b) is compiled for IA32 without frame pointers, the following assembly
+code is generated:
+
+int call_proc()
+
+1 call_proc:
+2   subl      $40, %esp
+3   movl      $2, 36(%esp)
+4   movw      $3, 34(%esp)
+5   movb      $4, 33(%esp)
+6   leal      33(%esp), %eax
+7   movl      %eax, 20(%esp)
+8   movl      $4, 16(%esp)
+9   leal      34(%esp), %eax
+10  movl      %eax, 12(%esp)
+11  movl      $3, 8(%esp)
+12  leal      36(%esp), %eax
+13  movl      %eax, 4(%esp)
+14  movl      $2, (%esp)
+15  call      proc
+16  movswl    34(%esp), %eax
+17  movsbl    33(%esp), %edx
+18  subl      %edx, %eax
+19  imull     36(%esp), %eax
+20  addl      $40, %esp
+21  ret
+
+A. How much space is allocated on the stack for the local variables and argument build area?
+
+B. What local variables are generated and where are they stored within the stack frame, relative to %esp?
+
+C. Where is each of the six arguments stored on the stack?
+
+D. Annotate the assembly code to describe the match between its instructions and the actions described by the C code.
+

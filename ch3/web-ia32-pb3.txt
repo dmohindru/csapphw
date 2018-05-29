@@ -1,0 +1,35 @@
+Practice Problem 3:
+
+Figure 10(a) C code for proc
+------------
+void proc(int a2, int *a2p,
+          short a3, short *a3p,
+          char a4, char *a4p)
+{
+    *a2p += a2;
+    *a3p += a3;
+    *a4p += a4;
+}
+
+When the C code of Figure 10(a) is compiled for IA32 without frame pointers, the following assembly
+code is generated:
+
+void proc(int a2, int *a2p, short a3, short *a3p, char a4, char *a4p)
+
+1 proc:
+2   pushl     %ebx
+3   movl      12(%esp), %ecx
+4   movl      20(%esp), %edx
+5   movl      28(%esp), %eax
+6   movl      8(%esp), %ebx
+7   addl      %ebx, (%ecx)
+8   movl      16(%esp), %ecx
+9   addw      %cx, (%edx)
+10  movl      24(%esp), %edx
+11  addb      %dl, (%eax)
+12  popl      %ebx
+13  ret
+
+A. What offsets, relative to %esp, does the function use in retrieving the arguments from the stack?
+
+B. Annotate the assembly code to describe the match between its instructions and the actions described by the C code.
