@@ -36,6 +36,35 @@ void proc(int a2, int *a2p, short a3, short *a3p, char a4, char *a4p)
 16  ret
 
 A. What offsets, relative to %ebp does the function use in retrieving the arguments from the stack?
+argument    bytes     offset
+--------    -----     ------    
+a2            4         8
+a2p           4         12
+a3            2         16
+a3p           4         20
+a4            1         24
+a4p           4         28
 
 
 B. Annotate the assembly code to describe the match between its instructions and the actions described by the C code.
+
+1 proc:
+2   pushl     %ebp              ; push old %ebp to stack
+3   movl      %esp, %ebp        ; save current %esp to %ebp
+4   pushl     %ebx              ; push callee save register
+5   movl      12(%ebp), %ecx    ; get a2p pointer value in %ecx
+6   movl      20(%ebp), %edx    ; get a3p pointer value in %edx
+7   movl      28(%ebp), %eax    ; get a4p pointer value in %eax
+8   movl      8(%ebp), %ebx     ; get value of a2 in %ebx
+9   addl      %ebx, (%ecx)      ; *a2p += a2
+10  movl      16(%ebp), %ecx    ; get value of a3 in %ecx
+11  addw      %cx, (%edx)       ; *a3p += a3
+12  movl      24(%ebp), %edx    ; get value of a4 in %edx
+13  addb      %dl, (%eax)       ; *a4p += a4
+14  popl      %ebx              ; restore %ebx
+15  popl      %ebp              ; restore %ebp
+16  ret                         ; return
+
+-----------------------
+result - all ok
+-----------------------
