@@ -31,5 +31,31 @@ void proc(int a2, int *a2p, short a3, short *a3p, char a4, char *a4p)
 13  ret
 
 A. What offsets, relative to %esp, does the function use in retrieving the arguments from the stack?
+argument    size    offset
+--------    ----    ------
+a2            4       8
+a2p           4       12
+a3            2       16
+a3p           4       20
+a4            1       24
+a4p           4       28
 
 B. Annotate the assembly code to describe the match between its instructions and the actions described by the C code.
+
+1 proc:
+2   pushl     %ebx                 ; save %ebx
+3   movl      12(%esp), %ecx       ; get a2p in %ecx
+4   movl      20(%esp), %edx       ; get a3p in %edx
+5   movl      28(%esp), %eax       ; get a4p in %eax
+6   movl      8(%esp), %ebx        ; get value of a2 in %ebx
+7   addl      %ebx, (%ecx)         ; *a2p += a2
+8   movl      16(%esp), %ecx       ; get value of a3 in %ecx
+9   addw      %cx, (%edx)          ; *a3p += a3
+10  movl      24(%esp), %edx       ; get value of a4 in %edx
+11  addb      %dl, (%eax)          ; *a4p += a4
+12  popl      %ebx                 ; restore value of %ebx
+13  ret
+
+-----------------------
+result ok
+-----------------------
