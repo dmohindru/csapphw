@@ -38,10 +38,49 @@ int call_proc()
 21  ret
 
 A. How much space is allocated on the stack for the local variables and argument build area?
+Ans. 40 bytes
 
 B. What local variables are generated and where are they stored within the stack frame, relative to %esp?
+variable    size    offset
+--------    ----    ------
+x2            4       36
+x3            2       34
+x4            1       33
 
 C. Where is each of the six arguments stored on the stack?
+argument    size    offset
+--------    ----    ------
+x2            4     %esp
+&x2           4     %esp+4
+x3            2     %esp+8
+&x3           4     %esp+12
+x4            1     %esp+16
+&x4           4     %esp+20
 
 D. Annotate the assembly code to describe the match between its instructions and the actions described by the C code.
 
+1 call_proc:
+2   subl      $40, %esp         ; allocate 40 bytes on stack
+3   movl      $2, 36(%esp)      ; x2 = 2
+4   movw      $3, 34(%esp)      ; x3 = 3
+5   movb      $4, 33(%esp)      ; x4 = 4
+6   leal      33(%esp), %eax    ; compute &x4
+7   movl      %eax, 20(%esp)    ; store &x4 as 6th argument
+8   movl      $4, 16(%esp)      ; store 4 as 5th argument
+9   leal      34(%esp), %eax    ; compute &x3
+10  movl      %eax, 12(%esp)    ; store &x3 as 4th argument
+11  movl      $3, 8(%esp)       ; store 3 as 3th argument
+12  leal      36(%esp), %eax    ; compute &x2
+13  movl      %eax, 4(%esp)     ; store &x2 as 2nd argument
+14  movl      $2, (%esp)        ; store 2 as 1st argument
+15  call      proc              ; call proc(x2, &x2, x3, &x3, x4, &x4)
+16  movswl    34(%esp), %eax    ; move value of x3 in %ebx
+17  movsbl    33(%esp), %edx    ; move value of x4 in %edx
+18  subl      %edx, %eax        ; compute x3-x4
+19  imull     36(%esp), %eax    ; compute x2*(x3-x4)
+20  addl      $40, %esp         ; deallocate 40 bytes on stack
+21  ret
+
+-----------------------
+result - all ok
+-----------------------
