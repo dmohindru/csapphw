@@ -1,0 +1,19 @@
+Practice Problem 1
+
+
+int tmult_ok4(long x, long y, long *dest)
+{
+  unsigned char bresult;
+  
+  asm("imulq %[x], %[y]"
+      "setae %[b]         # Set low-order byte \n\t"
+      : [y] "+r" (y), [b] "=r" (bresult)     /* Output */
+      : [x] "r" (x)                          /* No Input */
+      );
+  *dest = x*y;
+  return (int) bresult;
+}
+
+
+
+
