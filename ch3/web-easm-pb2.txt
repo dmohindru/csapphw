@@ -1,1 +1,15 @@
 mulq S      R[%rdx]:R[%rax]   <------ S X R[%rax]
+
+/* Multiply two 64-bit numbers to get 128-bit result,
+*/
+void umult_full(unsigned long x, unsigned long y, unsigned long *dest)
+{
+  asm("movq %[x], %%rax           # Get x\n\t"
+      "mulq %[y]                  # unsigned multiply by y\n\t"
+      "movq %%rax, %[dest_low]    # store low order  8 bytes\n\t"
+      "movq %%rdx, %[dest_high]   # store high order 8 bytes"
+      : [dest_low] "=m" (dest[0]), [dest_high] "=m" (dest[1]) /*Outputs    */   
+      : [x] "r" (x), [y] "r" (y)                              /*Inputs     */
+      : "%rax", "%rdx"                                        /*Overwrites */
+      );
+}

@@ -8,7 +8,7 @@ int tmult_ok4(long x, long y, long *dest)
   asm("imulq %[x], %[y]"
       "setae %[b]         # Set low-order byte \n\t"
       : [y] "+r" (y), [b] "=r" (bresult)     /* Output */
-      : [x] "r" (x)                          /* No Input */
+      : [x] "r" (x)                          /* Input */
       );
   *dest = x*y;
   return (int) bresult;
