@@ -1,1 +1,1 @@
-
+mulq S      R[%rdx]:R[%rax]   <------ S X R[%rax]
