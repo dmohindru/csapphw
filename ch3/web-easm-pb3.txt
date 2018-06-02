@@ -1,1 +1,14 @@
+void bad_incr(int *ptr)
+{
+  (*ptr)++;
+}
+
+void lock_incr(int *ptr)
+{
+  (*ptr)++;
+  asm("lock                 # Set lock\n\t"
+      "addl $1, %[ptr]"     # Increment *ptr
+      : [ptr] "+m" (*ptr)   /* Output */
+      );
+}
 

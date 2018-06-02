@@ -1,1 +1,10 @@
 
+double dmin(double x, double y)
+{
+  double min;
+  asm("vminsd %[x], %[y], %[min_val]"
+      : [min_val] "=x" (min)
+      : [x] "x" (x), [y] "x" (y)
+      );
+  return min;
+}
