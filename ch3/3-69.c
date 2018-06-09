@@ -4,8 +4,8 @@ typedef struct {
   int last; //4 bytes
 } b_struct;
 typedef struct {
-  long idx
-  long x[]
+  long idx;
+  long x[4];
 } a_struct;
 
 void test(long i, b_struct *bp) {
@@ -13,9 +13,33 @@ void test(long i, b_struct *bp) {
   a_struct *ap = &bp->a[i];
   ap->x[ap->idx] = n;
 }
-
+/*
 void test(long i, b_struct *bp)
 i in %rdi, bp in %rsi
+
+mov 0x120(%rsi), %ecx
+add (%rsi), %ecx
+lea (%rdi, %rdi, 4), %rax
+lea (%rsi, %rax, 8), %rax
+mov 0x8(%rax), %rdx
+movslq %ecx, %rcx
+mov %rcx,0x10(%rax,%rdx,8)
+retq
+==============================================
+a_struct is 40 bytes long
+first element of a_struct in idx 8 bytes (long)
+remain part of a_struct is array of type long
+with 32/8 = 4 elements
+==============================================
+Calculation of CNT
+End address of a_struct array = 288
+Start address of a_struct array = 8
+Total bytes allocated to a_struct[] = 288-8 = 280
+a_struct is 40 bytes
+CNT = 280/40 = 7
+==============================================
+
+
 
 mov 0x120(%rsi), %ecx
 %ecx = %rsi + 288 (alignment of 4 or 8) 
@@ -61,4 +85,5 @@ memory alignment for b_struct
 288-291 : last
 288 = CNT * 40 + 4
 solving for CNT
-CNT = 284 / 40 = 
+CNT = 284 / 40 =
+*/
