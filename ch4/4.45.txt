@@ -1,0 +1,28 @@
+From Practical problem 4.7
+Correct behaviour of pushq %rsp as under
+
+let initial value of %rsp = 100
+movq %rsp, %rax	# %rax = 100
+pushq %rsp
+----------
+(%rsp) = %rsp	# %rsp = 100
+%rsp = %rsp - 8 # %rsp = 100 - 8 = 92
+
+popq %rdx
+---------
+%rsp = %rsp + 8	# %rsp = 92 + 8 = 100
+%rdx = (%rsp)	# %rdx = 100
+
+
+subq %rdx, %rax # %rax = 100 - 100 = 0
+
+retq
+
+ANSWERS
+-------
+
+A. No. Because it pushes new value of %rsp on stack, but rather it should push old value of %rsp
+   on stack.
+
+B. movq %rsp, (%rsp)
+   subq $8, %rsp

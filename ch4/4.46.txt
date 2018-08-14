@@ -1,0 +1,29 @@
+From Practical problem 4.8
+Correct behaviour of popq %rsp as under
+Let initial value of %rsp = 100
+
+movq %rsp, %rdi
+pushq 0xabcd
+----------
+(%rsp) = 0xabcd	# %rsp = 100
+%rsp = %rsp - 8 # %rsp = 100 - 8 = 92
+
+popq %rsp
+---------
+%rsp = %rsp + 8	# %rsp = 92 + 8 = 100
+%rsp = (%rsp)	# %rsp = 0xabcd
+
+movq %rsp, %rax
+movq %rdi, %rsp
+
+retq
+
+ANSWERS
+-------
+
+A. No. Because it moves the value of %rsp from stack to register %rsp, but rather it should 
+   first decrement %rsp and then move the value of %rsp from stack to register %rsp.
+
+B. addq $8, %rsp
+   movq (%rsp), %rsp
+
