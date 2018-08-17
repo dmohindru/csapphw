@@ -1,0 +1,58 @@
+# Execution begins at address 0
+	.pos 0
+	irmovq	stack, %rsp    	# Set up stack pointer
+	call 	main			# Execute main program
+	halt					# Terminate program
+
+# Array of 5 element
+	.align 8
+data:	
+	.quad	0xE
+	.quad	0xB
+	.quad	0xC
+	.quad	0xF
+	.quad	0xD
+data_end:
+# main function to call bubble sort function
+main:
+	irmovq	data, %rdi		# move pointer to array of number to %rsi
+	irmovq	data_end, %rsi	# move lenght of array in %rsi
+	call bubble_p			# call bubble sort function
+	ret
+
+# bubble sort function bubble_p(long *data, long *data_end)
+# *data in %rdi, *data_end in %rsi
+bubble_p:
+	jmp L2					# jump to test condition
+L3:
+	rrmovq 	%rsi, %rax
+L6:	
+	irmovq	$8, %r8
+	subq 	%r8, %rax
+	rrmovq 	%rax, %r8
+	subq 	%rdi, %r8
+	jl 		L5
+	mrmovq  (%rax), %r14    # data+i
+	mrmovq  8(%rax), %r13   # data+i+1
+	rrmovq  %r13, %r8
+	subq    %r14, %r8
+	cmovl	%r13, %r10
+	cmovl	%r14, %r13
+	cmovl	%r10, %r14
+		
+	rmmovq  %r14, (%rax)
+	rmmovq  %r13, 8(%rax)
+L4:  
+	jmp 	L6
+L5:
+	irmovq	$8, %r8
+	addq 	%r8, %rdi
+L2:
+	rrmovq	%rsi, %r8
+	subq 	%rdi, %r8
+	jg 		L3
+	ret
+
+# Stack starts here and grows to lower address
+	.pos 0x200
+stack:
