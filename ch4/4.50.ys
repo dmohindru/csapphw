@@ -1,0 +1,79 @@
+# Execution begins at address 0
+	.pos 0
+	irmovq	stack, %rsp    	# Set up stack pointer
+	call 	main			# Execute main program
+	halt					# Terminate program
+
+# Jump table
+	.align 8
+return_value:
+	.quad	0				# memory location to test return value
+jump_table:	
+	.quad	L0				# case (0)
+	.quad	L3				# case (1)
+	.quad	L1				# case (2)
+	.quad	L2				# case (3)
+	.quad	L3				# case (4)
+	.quad	L1				# case (5)
+	.quad	L3				# default
+# main function to call bubble sort function
+main:
+	irmovq	$1000, %rdi		
+	call switchv
+	# store return value at memory location return_value
+	irmovq	return_value, %rbx
+	rmmovq	%rax, (%rbx)			
+	ret
+# idx in %rdi
+switchv:
+	# if idx greater than 5 jump to default
+	rrmovq 	%rdi, %r8
+	irmovq 	$5, %r9
+	subq 	%r9, %r8 			
+	jg		L3
+	# if idx less than 0 jump to default
+	rrmovq 	%rdi, %r8
+	irmovq 	$0, %r9
+	subq 	%r9, %r8 			
+	jl		L3
+	irmovq	$8, %rsi
+	call	multiply		# calculate offset into jump table
+	irmovq	jump_table, %r8
+	addq	%rax, %r8
+	mrmovq	(%r8), %rsi		# move contents of jump_table entry to %rsi
+	pushq	%rsi
+	ret					
+	
+L0:								# case 0
+	irmovq	$0xaaa, %rax
+	jmp L4
+L1:								# case 2, 5
+	irmovq	$0xbbb, %rax
+	jmp L4
+L2:								# case 3
+	irmovq	$0xccc, %rax
+	jmp L4
+L3:								# default
+	irmovq	$0xddd, %rax
+	jmp L4
+L4:
+	ret
+
+# multiply(n, times)
+# n in %rdi, times in %rsi 
+multiply:
+	irmovq 	$0, %r8
+	irmovq	$0, %rax
+	irmovq	$1, %r9
+	jmp 	mult_L0
+mult_L1:
+	addq 	%rdi, %rax
+	subq	%r9, %rsi
+mult_L0:
+	subq	%r8, %rsi
+	jg		mult_L1 
+	ret
+
+# Stack starts here and grows to lower address
+	.pos 0x200
+stack:
