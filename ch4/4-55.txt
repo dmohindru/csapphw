@@ -1,0 +1,5 @@
+1. We need to change Preditc PC Logic ---- easy consider using J_YES constant
+2. Change Select PC  --- easy togel condition for !M_Cnd
+3. Need mux at execute stage which selects valA between source values in valC and valA as condition
+	valC if E_icode in {jxx}
+	1: valA

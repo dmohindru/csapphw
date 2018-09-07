@@ -1,0 +1,11 @@
+misprediction condition when jxx always taken
+icode = JXX && !cnd
+
+misprediction condition when jxx not taken
+icode == JXX && cnd
+
+forward branch not taken misprediction
+if (valC < valP) # branch will be taken
+	icode == JXX && !cnd	# misprediction condition
+else
+	icode == JXX && cnd

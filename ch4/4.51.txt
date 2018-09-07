@@ -1,0 +1,29 @@
+iaddq V, %rB (10 bytes instruction)
+
+FETCH
+-----
+icode:ifun = M1[PC]
+rA:rB = M1[PC+1]
+valC = M8[PC+2]
+valP = PC + 10
+
+DECODE
+------
+valB = R[rB]
+
+EXECUTE
+-------
+valE = valC + valB
+Set CC
+
+MEMORY
+------
+
+
+WRITE BACK
+----------
+R[rB] = valE
+
+PC UPDATE
+---------
+PC = valP
