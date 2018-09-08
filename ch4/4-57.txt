@@ -1,0 +1,2 @@
+Load/Use hazard
+E_icode in { IMRMOVQ, IPOPQ } && E_dstM in {d_srcA, d_srcB} && !D_icode in {IPUSHQ, IRMMOVQ}
