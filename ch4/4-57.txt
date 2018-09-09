@@ -1,2 +1,19 @@
 Load/Use hazard
 E_icode in { IMRMOVQ, IPOPQ } && E_dstM in {d_srcA, d_srcB} && !D_icode in {IPUSHQ, IRMMOVQ}
+E_icode in { IMRMOVQ, IPOPQ } && E_dstM in {d_srcB}
+
+e.g.
+mrmovq 0(%rcx), %rdx # M_dstM = %rdx, m_valM = value read from memory
+pushq %rdx	# E_srcA = %rdx
+
+word e_valA = [
+	E_srcA == M_dstM && E_srcB != M_dstM : m_valM;
+	1 : E_valA;
+];
+
+e.g.
+pop %rdx # M_dstM = %rdx, m_valM = value read from memory
+rmmovq %rax, 0(%rdx) # E_srcA = %rax, E_srcB = %rdx
+
+mrmovq 0(%rcx), %rsp # M_dstM = %rsp, m_valM = value read from memory
+pushq %rsp	# E_srcA = %rsp, E_srcB = %rsp
