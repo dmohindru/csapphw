@@ -1,0 +1,29 @@
+popq rA to be treated as following sequence of instructions
+
+popq rA (iaddq $8, %rsp)
+---------Fetch--------	
+valP = PC
+---------Decode--------
+valB = R[%rsp]
+dstE = %rsp
+---------Execute-------
+valE  = 8 + valB	
+---------Memory--------
+No Operation
+---------Write---------			
+R[dstE=%rsp] = valE
+-----------------------
+
+popq2 rA (mrmovq -8(%rsp, rA) 			
+---------Fetch--------	
+valP = PC+2
+---------Decode--------
+valB = R[%rsp]
+dstM = rA
+---------Execute-------
+valE = -8 + valB	
+---------Memory--------
+valM = M[valE]
+---------Write---------			
+R[dstM=rA] = valM
+-----------------------
