@@ -1,0 +1,67 @@
+basis idea behind program proformance is how many cycles does it takes to
+complete its computations (include data, ret, branch misprediction hazards)
+
+4.47
+----
+Loop part
+L6:	
+	irmovq	$8, %r8
+	subq 	%r8, %rax
+	rrmovq 	%rax, %r8
+	subq 	%rdi, %r8
+	jl 		L5
+	mrmovq  (%rax), %r14    # data+i
+	mrmovq  8(%rax), %r13   # data+i+1
+	rrmovq  %r13, %r8
+	subq    %r14, %r8
+	jg 		L4
+	rmmovq  %r13, (%rax)
+	rmmovq  %r14, 8(%rax)
+No of cycles when 'jg L4' predicts correctly (50% times): 12 cycles
+No of cycles when 'jg L4' predicts incorrectly (50% times): 12 + 2 cycles
+Total average cycles: (12+12+2)/2 = 13 cycles
+
+4.48
+----
+Loop part
+L6:	
+	irmovq	$8, %r8
+	subq 	%r8, %rax
+	rrmovq 	%rax, %r8
+	subq 	%rdi, %r8
+	jl 		L5
+	mrmovq  (%rax), %r14    # data+i
+	mrmovq  8(%rax), %r13   # data+i+1
+	rrmovq  %r13, %r8
+	subq    %r14, %r8
+	cmovl	%r13, %r10
+	cmovl	%r14, %r13
+	cmovl	%r10, %r14
+	rmmovq  %r14, (%rax)
+	rmmovq  %r13, 8(%rax)
+Total Cycle: 14 cycles
+
+4.49
+----
+Loop part
+L6:	
+	irmovq	$8, %r8
+	subq 	%r8, %rax
+	rrmovq 	%rax, %r8
+	subq 	%rdi, %r8
+	jl 		L5
+	mrmovq  (%rax), %r14    # data+i
+	mrmovq  8(%rax), %r13   # data+i+1
+	rrmovq	%r14, %r9		# tmp 
+	rrmovq  %r14, %r8
+	xorq	%r13, %r14		# x = x ^ y
+	subq    %r13, %r8		# if (y > x)
+	cmovg	%r9, %r13		# y = tmp
+	xorq	%r14, %r13		# y = x ^ y
+	xorq	%r13, %r14		# x = x ^ y
+	rmmovq  %r14, (%rax)
+	rmmovq  %r13, 8(%rax)
+Total Cycle: 16 Cycles
+
+Comparing cycle of 4.47=13 cycles, 4.48=14 cycles, 4.49=16 cycles
+4.47 is winner with least cycles 13
