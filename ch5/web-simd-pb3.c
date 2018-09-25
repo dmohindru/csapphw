@@ -9,20 +9,20 @@
 /* Vector data type */
 typedef data_t vect_t __attribute__ ((vector_size(VBYTES)));
 
-void simd_pb1_combine(vec_ptr v, data_t *dest) {
+void inner4_simd(vec_ptr u, vec_ptr v, data_t *dest) {
 	long i;
-	vect_t accum, accum1, accum2, accum3;
-	vect_t chunk, chunk1, chunk2, chunk3;
-	int cnt = vec_length(v);
-	data_t result = IDENT;
+	vect_t accum;
+	vect_t chunk, chunk1;
+	int length = vec_length(u);
+	data_t *udata = get_vec_start(u);
+	data_t *vdata = get_vec_start(v);
+	data_t sum = (data_t) 0;
+	//start here
 	
 	/* Initialize all accum entries to IDENT */
 	for (i = 0; i < VSIZE; i++)
 	{
 		accum[i] = IDENT;
-		accum1[i] = IDENT;
-		accum2[i] = IDENT;
-		accum3[i] = IDENT;
 	}
 		
 	/* Single step until have memory alignment */
@@ -39,10 +39,7 @@ void simd_pb1_combine(vec_ptr v, data_t *dest) {
 		chunk2 = *((vect_t *) data+2*VSIZE);
 		chunk3 = *((vect_t *) data+3*VSIZE);
 		
-		accum = accum OP chunk;
-		accum1 = accum1 OP chunk1;
-		accum2 = accum2 OP chunk2;
-		accum3 = accum3 OP chunk3;
+		accum = accum OP (chunk OP chunk1) OP (chunk2 OP chunk3);
 		data += movement;
 		cnt -= movement;
 	}
@@ -52,8 +49,6 @@ void simd_pb1_combine(vec_ptr v, data_t *dest) {
 		cnt--;
 	}
 	
-	/* combine all accumulators */
-	accum = (accum OP accum1) OP (accum2 OP accum3);
 	
 	/* Combine elements of accumulator vector */
 	for (i = 0; i < VSIZE; i++)
@@ -65,4 +60,5 @@ void simd_pb1_combine(vec_ptr v, data_t *dest) {
 }
  
  
+
 
