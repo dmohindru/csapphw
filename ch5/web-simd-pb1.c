@@ -1,5 +1,5 @@
-/* SIMD Code
- */
+/* Web SIMD Practical Problem 1*/
+
 /* Number of bytes in a vector */
 #define VBYTES 32
 
