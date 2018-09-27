@@ -1,4 +1,4 @@
-/* Web SIMD Practical Problem 5*/
+/* Web SIMD Practical Problem 6*/
 
 /* Number of bytes in a vector */
 #define VBYTES 32
@@ -14,7 +14,7 @@ double poly_simd(double a[], double x, long degree) {
 	long cnt = degree+1;
 	double result = 0;
 	double xpwr = 1.0;
-	vect_t accum, xpwr_vec, xvv_vec, chunk;
+	vect_t accum, accum1, xpwr_vec, xpwr1_vec, xvv_vec, chunk, chunk1;
 	
 	xpwr = 1.0;
 	/* Initialize all accum entries to IDENT */
@@ -45,24 +45,35 @@ double poly_simd(double a[], double x, long degree) {
 		xpwr_vec[i] = xpwr;
 		xpwr *= x;
 	}
-	/* Main Loop */
 	
-	while (cnt >= VSIZE) {
+	/* Prepare xpwr1_vec */
+	for (i = 0; i < VSIZE; i++) 
+	{
+		xpwr1_vec[i] = xpwr;
+		xpwr *= x;
+	}
+	
+	/* Main Loop */
+	int movement = VSIZE * 2;
+	while (cnt >= movement) {
 		// Get uchunks
 		chunk = *((vect_t *) a);
+		chunk1 = *((vect_t *) a+VSIZE);
 		accum += chunk * xpwr_vec;
+		accum1 += chunk1 * xpwr1_vec;
 		xpwr_vec *= xvv_vec;
-		a += VSIZE;
-		cnt -= VSIZE;
+		xpwr1_vec *= xvv_vec;
+		a += movement;
+		cnt -= movement;
 	}
 	
 	/* Combine elements of accumulator vector */
 	xpwr = 1.0;
 	for (i = 0; i < VSIZE; i++)
-		result += accum[i];
+		result += accum[i] + accum1[i];
 	
 	/* Get highest power of x */
-	xpwr = xpwr_vec[0];
+	xpwr = xpwr1_vec[0];
 	
 	/* Single-set through remaining elements */
 	while (cnt) {
