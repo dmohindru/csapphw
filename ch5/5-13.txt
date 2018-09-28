@@ -1,0 +1,18 @@
+A.
+-- 
+See file 5-13.odp.
+
+B.
+-- 
+CPE lower bound is created by float add cell.
+So CPE lower bound is 3,
+
+C.
+---
+CPE lower bound is created by int add cell
+So CPE lower bound is 1.
+
+D.
+---
+On critical path its the add unit that counts.
+
