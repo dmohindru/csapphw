@@ -1,0 +1,22 @@
+Homework Problem 6-23
+---------------------
+t_access = t_avr_seek + t_avr_rot + t_avr_transfer
+
+t_max_rot (ms) = 1/RPM * 60 sec/1 min * 1000
+t_avr_rot = t_max_rot * 1/2
+
+t_avr_transfer = 1/RPM * 1/(Average sector per track) * 60 sec/1 min * 1000
+
+Parameters
+----------
+Rotational rate		12000 RPM
+T_avr_seek			3 ms
+Avr sector/track	500
+
+t_max_rot = 1/12000 * 60 * 1000 = 5 ms
+t_avr_rot = t_max_rot/2 = 2.5 ms
+
+t_avr_transfe = 1/12000 * 1/500 * 60 * 1000 = 0.01 ms
+
+t_access = 3ms + 2.5ms + 0.01ms = 5.51 ms
+

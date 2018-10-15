@@ -1,0 +1,20 @@
+Home work problem 6-22
+----------------------
+bit per tract
+bpt = x * r * K
+here K = bit per unit radius track
+tracks per disk
+tpd = (1-x) * r * M
+here M = tracks per unit length
+so total bit count on disk
+tbc = bpt * tpd
+tbc = x * r * K * (1-x) * r * M
+tbc = r^2 * K * M * (1-x) * x
+
+for x = 0.80, (1-x)*x = 0.160
+for x = 0.75, (1-x)*x = 0.1875
+for x = 0.50, (1-x)*x = 0.25
+for x = 0.25, (1-x)*x = 0.1875 
+for x = 0.10, (1-x)*x = 0.090
+
+so from above observation x is maximum when x = 0.5

@@ -1,0 +1,31 @@
+Homework Problem 6-24
+---------------------
+t_access = t_avr_seek + t_avr_rot + t_avr_transfer
+
+t_max_rot (ms) = 1/RPM * 60 sec/1 min * 1000
+t_avr_rot = t_max_rot * 1/2
+
+t_avr_transfer = 1/RPM * 1/(Average sector per track) * 60 sec/1 min * 1000
+
+Parameters
+----------
+Rotational Rate		18000 RPM
+t_avr_seek			8 ms
+Avr sector/track	2000
+Surfaces			4
+Sector size			512 bytes
+
+File size = 2 MB
+so total number of sector = 2 * 1024 * 1024 / 512 = 4096 sectors
+
+t_first_block_seek = t_avr_seek + t_rot_avr
+t_avr_seek = 8 ms
+t_rot_max = 1/18000 * 60 * 1000 = 3.33 ms
+t_rot_avr = t_rot_max * 1/2 = 1.67 ms
+t_first_block_seek = 8 + 1.67 = 9.67 ms
+
+Best case:
+t_best_case = t_first_block_seek + 2 * t_max_rot = 9.67 + 2 * 3.33 = 16.33 ms
+
+Random case:
+t_random_case = t_first_block_seek * 4096 = 39608.32 ms = 39.60 s 
