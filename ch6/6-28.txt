@@ -1,0 +1,51 @@
+Homework Problem 6-28
+---------------------
+
+A) Hex memory address that will hit in set 2
+
+NONE			--ok--
+
+B) Hex memory address that will hit in set 4
+
+1100 0111 100 00	=	0x18F0
+--------- --- --
+	t	   s  b 
+to
+
+1100 0111 100 11	=	0x18F3		--ok--			
+--------- --- --
+	t	   s  b 
+	
+-----------------------------
+
+0000 0101 100 00	=	0xB0
+--------- --- --
+	t	   s  b 
+to
+
+0000 0101 100 11	=	0xB3		--ok--		
+--------- --- --
+	t	   s  b 
+
+C) Hex memory address that will hit in set 5
+
+0111 0001 101 00	=	0xE34
+--------- --- --
+	t	   s  b 
+to
+
+0111 0001 101 11	=	0xE37		--ok--			
+--------- --- --
+	t	   s  b 
+
+D) Hex memory address that will hit in set 7
+
+1101 1110 111 00	=	0x1BDC
+--------- --- --
+	t	   s  b 
+to
+
+1101 1110 111 11	=	0x1BDF			--ok--
+--------- --- --
+	t	   s  b 
+

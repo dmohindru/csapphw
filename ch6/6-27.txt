@@ -1,0 +1,42 @@
+Homework Problem 6-27
+---------------------
+
+Cache configuration works as
+m = 13
+b = log2(4) = 2
+s = log2(8) = 3
+t = 13 - 3 - 2 = 8
+
+A) Hex memory address that will hit in set 1
+
+0100 0101 001 00	=	0x8A4
+--------- --- --
+	t	   s  b 
+to
+
+0100 0101 001 11	=	0x8A7			--ok--
+--------- --- --
+	t	   s  b 
+
+-------------------------
+
+0011 1000 001 00	=	0x704
+--------- --- --
+	t	   s  b 
+to
+
+0011 1000 001 11	=	0x707			--ok--
+--------- --- --
+	t	   s  b 
+
+
+B) Hex memory address that will hit in set 6
+
+1001 0001 110 00	=	0x1238
+--------- --- --
+	t	   s  b 
+to
+
+1001 0001 110 11	=	0x123B			--ok--
+--------- --- --
+	t	   s  b 
