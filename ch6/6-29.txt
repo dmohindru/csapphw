@@ -1,0 +1,46 @@
+Homework Problem 6-29
+---------------------
+A)
+CO = log2(block_sise) = log2(4) = 2
+CI = log2(set_size) = log2(4) = 2
+CT = m - CO - CI = 13 - 2 - 2 = 9
+
+Bit		12		11		10		9		8		7		6		5		4		3		2		1		0
+		CT		CT		CT		CT		CT		CT		CT		CT		CT		CI		CI		CO		CO
+
+B)
+Operation	Address		Hit?		Read Value
+Read		0x834		Miss		unknown
+Write		0x836		Hit			unknown
+Read		0xFFD		Hit			C0
+
+
+0x834
+-----
+
+0x834 = 1000 0011 01 00
+		--------- -- --
+			t	  s   b
+t = 0x83
+S = 1
+b = 00
+
+0x836
+-----
+
+0x836 = 1000 0011 01 10
+		--------- -- --
+			t	  s   b
+t = 0x83
+S = 1
+b = 2
+
+0xFFD
+-----
+
+0xFFD = 1111 1111 11 01
+		--------- -- --
+			t	  s   b
+t = 0xFF
+S = 3
+b = 1

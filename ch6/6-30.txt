@@ -1,0 +1,14 @@
+Homework Problem 6-30
+---------------------
+
+A)
+Cache Size = Sets(S) X Associative(E) X Block Size(B)
+C = 8 X 4 X 4 = 128 Bytes
+
+B)
+CO = log2(block_size) = log2(4) = 2
+CI = log2(set_size) = log2(8) = 3
+CT = m - CI - CO = 13 - 3 - 2 = 8
+
+Bit		12		11		10		9		8		7		6		5		4		3		2		1		0
+		CT		CT		CT		CT		CT		CT		CT		CT		CI		CI		CI		CO		CO
