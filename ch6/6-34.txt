@@ -1,0 +1,75 @@
+Homework Problem 6-34
+---------------------
+int array[4][4]
+src[4][4] : starts at 0
+dst[4][4] : starts at 64
+
+
+Cache configuration
+Set = 2
+Block = 16
+b = log2(16) = 4
+memory address range = 0 - 127
+so memory bits = log2(128) = 7
+tag = 7 - 1 - 4 = 2
+
+Address mapping
+CT CT		CI		CO CO CO CO
+
+src[0][0]
+---------
+mem: 0-3 : 00 0 0000 : 00 0 0011 
+t = 0 , s = 0 , offset start = 0, end = 3
+
+src[0][1]
+---------
+mem: 4-7 : 00 0 0100 : 00 0 0111 
+t = 0 , s = 0, offset start = 4, end = 7
+
+src[0][2]
+---------
+mem: 8-11 : 00 0 1000 : 00 0 1011 
+t = 0 , s = 0, offset start = 8, end = 11
+
+src[0][3]
+---------
+mem: 12-15 : 00 0 1100 : 00 0 1111 
+t = 0 , s = 0, offset start = 12, end = 15
+===============so src[0][0]:src[0][3] fits in 1 cache line=============
+src[1][0]
+---------
+mem: 16-19 : 00 1 0000 : 00 1 0011 
+t = 0 , s = 1 , offset start = 0, end = 3
+
+src[1][1]
+---------
+mem: 20-23 : 00 1 0100 : 00 1 0111 
+t = 0 , s = 1, offset start = 4, end = 7
+
+src[1][2]
+---------
+mem: 24-27 : 00 1 1000 : 00 1 1011 
+t = 0 , s = 1, offset start = 8, end = 11
+
+src[1][3]
+---------
+mem: 28-31 : 00 1 1100 : 00 1 1111 
+t = 0 , s = 1, offset start = 12, end = 15
+================so src[1][0]:src[1][3] fits in ===================
+src[2][0]
+mem: 32-35 : 01 0 0000 : 01 0 0011 
+t = 01 , s = 0, offset start = 0, end = 3
+
+
+
+
+
+
+dst Array
+---------
+
+		Col 0		Col 1		Col 2		Col 4
+Row 0	m
+Row 1	m
+Row 2	m
+Row 3	m
