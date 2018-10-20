@@ -1,0 +1,304 @@
+Homework Problem 6-35
+---------------------
+int array[4][4]
+src[4][4] : starts at 0
+dst[4][4] : starts at 64
+
+
+Cache configuration
+Cache size = 128 bytes
+Block = 16
+Set = 128/16 = 8
+b = log2(16) = 4
+s = log2(8) = 3
+memory address range = 0 - 127
+so memory bits = log2(128) = 7
+tag = 7 - 3 - 4 = 0
+
+Address mapping
+CT CT		CI		CO CO CO CO
+
+Summary of mapping
+------------------
+Array_index		Tag		Set
+src[0][0]		x		0
+src[0][1]		x		0
+src[0][2]		x		0
+src[0][3]		x		0
+---------
+src[1][0]		x		1
+src[1][1]		x		1
+src[1][2]		x		1
+src[1][3]		x		1
+---------
+src[2][0]		x		2
+src[2][1]		x		2
+src[2][2]		x		2
+src[2][3]		x		2
+---------
+src[3][0]		x		3
+src[3][1]		x		3
+src[3][2]		x		3
+src[3][3]		x		3
+---------
+dst[0][0]		x		4
+dst[0][1]		x		4
+dst[0][2]		x		4
+dst[0][3]		x		4		
+---------
+dst[1][0]		x		5
+dst[1][1]		x		5
+dst[1][2]		x		5
+dst[1][3]		x		5
+---------
+dst[2][0]		x		6
+dst[2][1]		x		6
+dst[2][2]		x		6
+dst[2][3]		x		6
+---------
+dst[3][0]		x		7
+dst[3][1]		x		7
+dst[3][2]		x		7
+dst[3][3]		x		7
+---------
+
+src array
+---------
+
+		Col 0		Col 1		Col 2		Col 4
+Row 0	m			h			h			h
+Row 1	m			h			h			h
+Row 2	m			h			h			h
+Row 3	m			h			h			h
+
+hit = 12
+total access = 16
+hit rate = 12/16 = 0.75
+
+dst array
+---------
+
+		Col 0		Col 1		Col 2		Col 4
+Row 0	m			h			h			h
+Row 1	m			h			h			h
+Row 2	m			h			h			h
+Row 3	m			h			h			h
+
+Array index access pattern
+--------------------------
+Array_index		tag		set
+src[0][0]		x		0
+dst[0][0]		x		4
+---------
+src[0][1]		x		0
+dst[1][0]		x		5
+---------
+src[0][2]		x		0
+dst[2][0]		x		6
+---------
+src[0][3]		x		0
+dst[3][0]		x		7
+---------
+src[1][0]		x		1
+dst[0][1]		x		4
+---------
+src[1][1]		x		1
+dst[1][1]		x		5
+---------
+src[1][2]		x		1
+dst[2][1]		x		6
+---------
+src[1][3]		x		1
+dst[3][1]		x		7
+---------
+src[2][0]		x		2
+dst[0][2]		x		4		
+---------
+src[2][1]		x		2
+dst[1][2]		x		5
+---------
+src[2][2]		x		2
+dst[2][2]		x		6
+---------
+src[2][3]		x		2
+dst[3][2]		x		7
+---------
+src[3][0]		x		3
+dst[0][3]		x		4
+---------
+src[3][1]		x		3
+dst[1][3]		x		5
+---------
+src[3][2]		x		3
+dst[2][3]		x		6
+---------
+src[3][3]		x		3
+dst[3][3]		x		7
+
+Memory-Cache Mapping
+--------------------
+
+src array
+---------
+
+src[0][0]
+---------
+mem: 0-3 : 000 0000 : 000 0011 
+t = x , s = 0 , offset start = 0, end = 3
+
+src[0][1]
+---------
+mem: 4-7 : 000 0100 : 000 0111 
+t = x , s = 0, offset start = 4, end = 7
+
+src[0][2]
+---------
+mem: 8-11 : 000 1000 : 000 1011 
+t = x , s = 0, offset start = 8, end = 11
+
+src[0][3]
+---------
+mem: 12-15 : 000 1100 : 000 1111 
+t = x , s = 0, offset start = 12, end = 15
+===============so src[0][0]:src[0][3] fits in 1 cache line=============
+src[1][0]
+---------
+mem: 16-19 : 001 0000 : 001 0011 
+t = x , s = 1 , offset start = 0, end = 3
+
+src[1][1]
+---------
+mem: 20-23 : 001 0100 : 001 0111 
+t = x , s = 1, offset start = 4, end = 7
+
+src[1][2]
+---------
+mem: 24-27 : 001 1000 : 001 1011 
+t = x , s = 1, offset start = 8, end = 11
+
+src[1][3]
+---------
+mem: 28-31 : 001 1100 : 001 1111 
+t = x , s = 1, offset start = 12, end = 15
+================so src[1][0]:src[1][3] fits in 1 cache line ===================
+src[2][0]
+mem: 32-35 : 010 0000 : 010 0011 
+t = x , s = 2, offset start = 0, end = 3
+
+src[2][1]
+---------
+mem: 36-39 : 010 0100 : 010 0111 
+t = x , s = 2, offset start = 4, end = 7
+
+src[2][2]
+---------
+mem: 40-43 : 010 1000 : 010 1011 
+t = x , s = 2, offset start = 8, end = 11
+
+src[2][3]
+---------
+mem: 44-47 : 010 1100 : 010 1111 
+t = x , s = 2, offset start = 12, end = 15
+=================================================================================
+src[3][0]
+mem: 48-51 : 011 0000 : 011 0011 
+t = x , s = 3, offset start = 0, end = 3
+
+src[3][1]
+---------
+mem: 52-55 : 011 0100 : 011 0111 
+t = x , s = 3, offset start = 4, end = 7
+
+src[3][2]
+---------
+mem: 56-59 : 011 1000 : 011 1011 
+t = x , s = 3, offset start = 8, end = 11
+
+src[3][3]
+---------
+mem: 60-63 : 011 1100 : 011 1111 
+t = x , s = 3, offset start = 12, end = 15
+
+
+
+dst array
+---------
+
+dst[0][0]
+---------
+mem: 64-67 : 100 0000 : 100 0011 
+t = x , s = 4 , offset start = 0, end = 3
+
+dst[0][1]
+---------
+mem: 68-71 : 100 0100 : 100 0111 
+t = x , s = 4, offset start = 4, end = 7
+
+dst[0][2]
+---------
+mem: 72-75 : 100 1000 : 100 1011 
+t = x , s = 4, offset start = 8, end = 11
+
+dst[0][3]
+---------
+mem: 76-79 : 100 1100 : 100 1111 
+t = x , s = 4, offset start = 12, end = 15
+===============so dst[0][0]:dst[0][3] fits in 1 cache line=============
+dst[1][0]
+---------
+mem: 80-83 : 101 0000 : 101 0011 
+t = x , s = 5 , offset start = 0, end = 3
+
+dst[1][1]
+---------
+mem: 84-87 : 101 0100 : 101 0111 
+t = x , s = 5, offset start = 4, end = 7
+
+dst[1][2]
+---------
+mem: 88-91 : 101 1000 : 101 1011 
+t = x , s = 5, offset start = 8, end = 11
+
+dst[1][3]
+---------
+mem: 92-95 : 101 1100 : 101 1111 
+t = x , s = 5, offset start = 12, end = 15
+================so dst[1][0]:dst[1][3] fits in 1 cache line ===================
+dst[2][0]
+mem: 96-99 : 110 0000 : 110 0011 
+t = x , s = 6, offset start = 0, end = 3
+
+dst[2][1]
+---------
+mem: 100-103 : 110 0100 : 110 0111 
+t = x , s = 6, offset start = 4, end = 7
+
+dst[2][2]
+---------
+mem: 104-107 : 110 1000 : 110 1011 
+t = x , s = 6, offset start = 8, end = 11
+
+dst[2][3]
+---------
+mem: 108-111 : 110 1100 : 110 1111 
+t = x , s = 6, offset start = 12, end = 15
+=================================================================================
+dst[3][0]
+mem: 112-115 : 111 0000 : 111 0011 
+t = x , s = 7, offset start = 0, end = 3
+
+dst[3][1]
+---------
+mem: 116-119 : 111 0100 : 111 0111 
+t = x , s = 7, offset start = 4, end = 7
+
+dst[3][2]
+---------
+mem: 120-123 : 111 1000 : 111 1011 
+t = x , s = 7, offset start = 8, end = 11
+
+dst[3][3]
+---------
+mem: 124-127 : 111 1100 : 111 1111 
+t = x , s = 7, offset start = 12, end = 15
+
