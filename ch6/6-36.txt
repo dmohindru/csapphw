@@ -1,2 +1,120 @@
 Homework Problem 6-36
 ---------------------
+int x[2][128];
+
+assuming int = 4 bytes
+
+total memory used = 2 * 128 * 4 = 1024 bytes
+
+single row of x[0] or x[1] would consume = 128 * 4 = 512
+
+A)
+CACHE CONFIGURATION
+Cache size = 512 bytes
+Block size = 16 bytes
+Cache sets = 512/16 = 32
+Block bits = log2(16) = 4
+Set bits = log2(32) = 5
+
+Since block size is 16 bytes, 4 contigeous array elements can be
+accomodated in 1 block
+Therefore
+x[0][0] - x[0][3]:  	(0 - 15)   		(0 00000 0000 - 0 00000 1111) = set 0
+x[0][4] - x[0][7]:  	(16 - 31)  		(0 00001 0000 - 0 00001 1111) = set 1
+x[0][8] - x[0][11]: 	(32 - 47)  		(0 00010 0000 - 0 00010 1111) = set 2
+.....
+.....
+x[0][124] - x[0][127]: 	(496 - 511)  	(0 11111 0000 - 0 11111 1111) = set 31
+---------------------------------------------------------------------------
+x[1][0] - x[0][3]:  	(512 - 527)    	(1 00000 0000 - 1 00000 1111) = set 0
+x[1][4] - x[0][7]:  	(528 - 543)    	(1 00001 0000 - 1 00001 1111) = set 1
+x[1][8] - x[0][11]: 	(544 - 559)    	(1 00010 0000 - 1 00010 1111) = set 2
+.....
+.....
+x[1][124] - x[0][127]: 	(1008 - 1023)  	(1 11111 0000 - 1 11111 1111) = set 31
+
+So from above analysis rows x[0] and x[1] columns [0-127] mapps to same set with different
+tag bit.
+Miss rate = 1 or 100%
+
+B)
+CACHE CONFIGURATION
+Cache size = 1024 bytes
+Block size = 16 bytes
+Cache sets = 1024/16 = 64
+Block bits = log2(16) = 4
+Set bits = log2(32) = 6
+
+Since block size is 16 bytes, 4 contigeous array elements can be
+accomodated in 1 block
+Therefore
+x[0][0] - x[0][3]:  	(0 - 15)   		(000000 0000 - 000000 1111) = set 0
+x[0][4] - x[0][7]:  	(16 - 31)  		(000001 0000 - 000001 1111) = set 1
+x[0][8] - x[0][11]: 	(32 - 47)  		(000010 0000 - 000010 1111) = set 2
+.....
+.....
+x[0][124] - x[0][127]: 	(496 - 511)  	(011111 0000 - 011111 1111) = set 31
+---------------------------------------------------------------------------
+x[1][0] - x[0][3]:  	(512 - 527)    	(100000 0000 - 100000 1111) = set 32
+x[1][4] - x[0][7]:  	(528 - 543)    	(100001 0000 - 100001 1111) = set 33
+x[1][8] - x[0][11]: 	(544 - 559)    	(100010 0000 - 100010 1111) = set 34
+.....
+.....
+x[1][124] - x[0][127]: 	(1008 - 1023)  	(111111 0000 - 111111 1111) = set 63
+
+So from above analysis whole of array can be stored in cache. But there is a 
+complusory 1 miss for every four contigoues array elements.
+Total memory access = 128 * 2 = 256
+Total misses = 256/4 = 64
+Miss rate = 64/256 = 1/4 = 25%
+
+C)
+CACHE CONFIGURATION
+Cache size = 512 bytes
+Block size = 16 bytes
+Cache sets = 512/(2*16) = 16
+Block bits = log2(16) = 4
+Set bits = log2(32) = 4
+
+Since block size is 16 bytes, 4 contigeous array elements can be
+accomodated in 1 block
+Therefore
+x[0][0] - x[0][3]:  	(0 - 15)   		(00 0000 0000 - 00 0000 1111) = set 0
+x[0][4] - x[0][7]:  	(16 - 31)  		(00 0001 0000 - 00 0001 1111) = set 1
+x[0][8] - x[0][11]: 	(32 - 47)  		(00 0010 0000 - 00 0010 1111) = set 2
+.....
+x[0][60] - x[0][63]: 	(240 - 255)		(00 1111 0000 - 00 1111 1111) = set 15
+.....
+x[0][64] - x[0][67]: 	(256 - 271)		(01 0000 0000 - 01 0000 1111) = set 0
+.....
+x[0][124] - x[0][127]: 	(496 - 511)  	(01 1111 0000 - 01 1111 1111) = set 15
+---------------------------------------------------------------------------
+x[1][0] - x[0][3]:  	(512 - 527)    	(10 0000 0000 - 10 0000 1111) = set 0
+x[1][4] - x[0][7]:  	(528 - 543)    	(10 0001 0000 - 10 0001 1111) = set 1
+x[1][8] - x[0][11]: 	(544 - 559)    	(10 0010 0000 - 10 0010 1111) = set 2
+.....
+x[1][60] - x[1][63]: 	(752 - 767)		(10 1111 0000 - 10 1111 1111) = set 15
+.....
+x[1][64] - x[1][67]: 	(768 - 271)		(11 0000 0000 - 11 0000 1111) = set 0
+.....
+x[1][124] - x[0][127]: 	(1008 - 1023)  	(11 1111 0000 - 11 1111 1111) = set 15
+
+With this cache configuration first half of both rows can be held in cache simenteously.
+i.e. x[0][0] - x[0][63]
+and  x[1][0] - x[1][63]
+
+There is a complusory 1 miss for every four contigoues array elements.
+Memory access for half of array access = 128/2 * 2 = 128
+So miss rate for half of array access = 128/4 = 32
+Total memory access = 128 * 2 = 256
+Total misses = 32 * 2 = 64
+Miss rate = 64/256 = 1/4 = 25%
+
+D)
+Larger cache size will not help in reducing cache miss as there are complusory misses
+With block size = 16, miss rate is 4/16 = 25% which is lowest
+
+E)
+Largr block size will help in reducing cache miss as this technique help in reducing complusory misses
+With block size = 16, miss rate is 4/16 = 25%
+With block size = 32, miss rate is 4/32 = 12.5% which is halfed from block size of 16

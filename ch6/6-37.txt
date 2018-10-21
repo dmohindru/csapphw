@@ -1,0 +1,39 @@
+Homework Problem 6-37
+---------------------
+
+int array_t[N][N]
+assuming sizeof(int) = 4
+
+CACHE CONFIGURATION
+Cache size = 4096 bytes
+Block size = 16 bytes
+Cache sets = 256 sets
+Block bits = log2(16) = 4 bits
+Set bits = log2(256) = 8 bits
+
+For N = 64, size of array_t = 64*64*4 = 16384 bytes
+For N = 60, size of array_t = 60*60*4 = 14400 bytes
+start address = 0x08000000
+
+For block size of 16, four contigous array elements can be held in single cache set.
+
+Cache Mapping for N = 64
+At any time cache can hold 1/4 of a in it
+End block offest index(60-63) = F0-FF 
+60 * 4 = 240 bytes
+63 * 4 = 255 bytes
+----------------------------------------------------------
+a[0][0]-a[0][3] 	= 0x08000 00 0-0x08000 00 F = set 0
+....
+a[0][60]-a[0][63] 	= 0x08000 0F 0-0x08000 0F F = set 15
+----------------------------------------------------------
+a[1][0]-a[0][3] 	= 0x08000 10 0-0x08000 10 F = set 16
+....
+a[1][60]-a[0][63] 	= 0x08000 1F 0-0x08000 1F F = set 31
+----------------------------------------------------------
+....
+----------------------------------------------------------
+a[15][0]-a[15][3] 	= 0x08000 10 0-0x08000 10 F = set 16 --woring on it--
+....
+a[15][60]-a[15][63] 	= 0x08000 1F 0-0x08000 1F F = set 31
+----------------------------------------------------------
