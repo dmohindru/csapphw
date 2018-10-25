@@ -1,0 +1,8 @@
+Homework Problem 6-39
+---------------------
+
+A) Total writes = 
+
+B) Total hits for write = 
+
+C) Hit rate = 768/1024 = 
