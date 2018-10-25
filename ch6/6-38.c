@@ -38,13 +38,13 @@ void access_pattern_6_38()
 			//if (j % col_width == 0)
 			
 			address = (long)&square[i][j].c - (long)square;
-			printf("square[i][j].c=[%ld] ", (address>>4)&0x3F);
+			printf("square[%d][%d].c=[%ld] ", i, j, (address>>4)&0x3F);
 			address = (long)&square[i][j].m - (long)square;
-			printf("square[i][j].m=[%ld] ", (address>>4)&0x3F);
+			printf("square[%d][%d].m=[%ld] ", i, j, (address>>4)&0x3F);
 			address = (long)&square[i][j].y - (long)square;
-			printf("square[i][j].y=[%ld] ", (address>>4)&0x3F);
+			printf("square[%d][%d].y=[%ld] ", i, j, (address>>4)&0x3F);
 			address = (long)&square[i][j].k - (long)square;
-			printf("square[i][j].k=[%ld] ", (address>>4)&0x3F);
+			printf("square[%d][%d].k=[%ld] ", i, j, (address>>4)&0x3F);
 			printf("\n");
 		}
 	}
