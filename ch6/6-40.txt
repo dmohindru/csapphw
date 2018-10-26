@@ -1,0 +1,8 @@
+Homework Problem 6-40
+---------------------
+
+A) Total writes = 16 * 16 * 4 = 1024 writes
+
+B) Total hits for write = 16 * 16 * 2 = 512 hits
+
+C) Hit rate = 768/1024 = 0.50
