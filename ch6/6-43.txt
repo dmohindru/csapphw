@@ -1,0 +1,9 @@
+Homework Problem 6-43
+---------------------
+A) Totay memory bytes = 640 * 480 * 1 = 307200 bytes
+
+A) Total writes = 640 * 480 * 1 = 307200 writes
+
+B) Total hits for write = 307200 * 1/2 = 153600 hits
+
+C) Hit rate = 153600/307200 = 0.5

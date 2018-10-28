@@ -1,0 +1,8 @@
+Homework Problem 6-41
+---------------------
+
+A) Total writes = 640 * 480 * 4 = 1228800 writes
+
+B) Total hits for write = 1228800 / 4 * 3 = 921600 hits
+
+C) Hit rate = 921600/1228800 = 0.75

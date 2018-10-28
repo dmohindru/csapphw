@@ -11,6 +11,9 @@
 #define ROWS 480
 #define COLS 640
 #define CACHE_SIZE 4096
+#define BLOCK_BITS 3
+#define SET_BITS 12
+#define SET_MASK 0xFFF
 
 int cache[CACHE_SIZE];
 
@@ -36,24 +39,24 @@ void access_pattern_6_41()
 {
 	int i, j, col_width=4, num_access, num_miss, cache_set, cache_tag;
 	long address;
-	printf("===========================================\n");
-	printf("Cache set access pattern for N=%d\n", N);
-	printf("===========================================\n");
+	//printf("===========================================\n");
+	//printf("Cache set access pattern for N=%d\n", N);
+	//printf("===========================================\n");
 	printf("\n+++++++Acess pattern for problem 6-41+++++++\n");
 	clear_cache();
 	num_access = 0;
 	num_miss = 0;
-	for (i = 15; i >= 0; i--)
+	for (j = 639; j >= 0; j--)
 	{
 		printf("\n---------------i=%d-----------------------\n", i);
-		for (j = 15; j>=0; j--)
+		for (i = 479; i>=0; i--)
 		{
 			//if (j % col_width == 0)
 			
-			address = (long)&square[i][j].c - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].c=[%d-0x%x] ", i, j, cache_set, cache_tag);
+			address = (long)&buffer[i][j].r - (long)buffer;
+			cache_set = (address>>BLOCK_BITS)&SET_MASK;
+			cache_tag = (unsigned)address>>(BLOCK_BITS+SET_BITS);
+			printf("buffer[%d][%d].r=[%d-0x%x] ", i, j, cache_set, cache_tag);
 			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
 			if (cache[cache_set] != cache_tag)
 			{
@@ -61,10 +64,10 @@ void access_pattern_6_41()
 				cache[cache_set] = cache_tag;
 			}
 			num_access++;
-			address = (long)&square[i][j].m - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].m=[%d-0x%x] ", i, j, cache_set, cache_tag);
+			address = (long)&buffer[i][j].g - (long)buffer;
+			cache_set = (address>>BLOCK_BITS)&SET_MASK;
+			cache_tag = (unsigned)address>>(BLOCK_BITS+SET_BITS);
+			printf("buffer[%d][%d].m=[%d-0x%x] ", i, j, cache_set, cache_tag);
 			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
 			if (cache[cache_set] != cache_tag)
 			{
@@ -72,10 +75,10 @@ void access_pattern_6_41()
 				cache[cache_set] = cache_tag;
 			}
 			num_access++;
-			address = (long)&square[i][j].y - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].y=[%d-0x%x] ", i, j, cache_set, cache_tag);
+			address = (long)&buffer[i][j].b - (long)buffer;
+			cache_set = (address>>BLOCK_BITS)&SET_MASK;
+			cache_tag = (unsigned)address>>(BLOCK_BITS+SET_BITS);
+			printf("buffer[%d][%d].y=[%d-0x%x] ", i, j, cache_set, cache_tag);
 			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
 			if (cache[cache_set] != cache_tag)
 			{
@@ -83,10 +86,10 @@ void access_pattern_6_41()
 				cache[cache_set] = cache_tag;
 			}
 			num_access++;
-			address = (long)&square[i][j].k - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].k=[%d-0x%x] ", i, j, cache_set, cache_tag);
+			address = (long)&buffer[i][j].a - (long)buffer;
+			cache_set = (address>>BLOCK_BITS)&SET_MASK;
+			cache_tag = (unsigned)address>>(BLOCK_BITS+SET_BITS);
+			printf("buffer[%d][%d].a=[%d-0x%x] ", i, j, cache_set, cache_tag);
 			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
 			if (cache[cache_set] != cache_tag)
 			{
@@ -105,158 +108,73 @@ void access_pattern_6_41()
 
 void access_pattern_6_42()
 {
-	int i, j, col_width=4, num_access, num_miss, cache_set, cache_tag;
+	int i, col_width=4, num_access, num_miss, cache_set, cache_tag;
 	long address;
-	printf("===========================================\n");
-	printf("Cache set access pattern for N=%d\n", N);
-	printf("===========================================\n");
-	printf("\n+++++++Acess pattern for problem 6-39+++++++\n");
 	clear_cache();
 	num_access = 0;
 	num_miss = 0;
-	for (i = 15; i >= 0; i--)
+	i = 0;
+	printf("\n+++++++Acess pattern for problem 6-42+++++++\n");
+	char *cptr = (char *)buffer;
+	for(; cptr < (((char *) buffer) + 640 * 480 * 4); cptr++)
 	{
-		printf("\n---------------i=%d-----------------------\n", i);
-		for (j = 15; j>=0; j--)
+		address = (long)cptr - (long)buffer;
+		cache_set = (address>>BLOCK_BITS)&SET_MASK;
+		cache_tag = (unsigned)address>>(BLOCK_BITS+SET_BITS);
+		printf("address(%ld)=[%d-0x%x] ", address, cache_set, cache_tag);
+		if (cache[cache_set] != cache_tag)
 		{
-			//if (j % col_width == 0)
-			
-			address = (long)&square[j][i].c - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].c=[%d-0x%x] ", j, i, cache_set, cache_tag);
-			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
-			if (cache[cache_set] != cache_tag)
-			{
-				num_miss++;
-				cache[cache_set] = cache_tag;
-			}
-			num_access++;
-			address = (long)&square[j][i].m - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].m=[%d-0x%x] ", j, i, cache_set, cache_tag);
-			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
-			if (cache[cache_set] != cache_tag)
-			{
-				num_miss++;
-				cache[cache_set] = cache_tag;
-			}
-			num_access++;
-			address = (long)&square[j][i].y - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].y=[%d-0x%x] ", j, i, cache_set, cache_tag);
-			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
-			if (cache[cache_set] != cache_tag)
-			{
-				num_miss++;
-				cache[cache_set] = cache_tag;
-			}
-			num_access++;
-			address = (long)&square[j][i].k - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].k=[%d-0x%x] ", j, i, cache_set, cache_tag);
-			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
-			if (cache[cache_set] != cache_tag)
-			{
-				num_miss++;
-				cache[cache_set] = cache_tag;
-			}
-			num_access++;
-			printf("\n");
+			num_miss++;
+			cache[cache_set] = cache_tag;
 		}
+		num_access++;
+		i++;
+		if (i % col_width == 0)
+			printf("\n");
+		
 	}
 	printf("\nnum_access: %d\n", num_access);
 	printf("num_miss: %d\n", num_miss);
 	printf("num_hits: %d\n", num_access - num_miss);
-}
+	
+} 
+
 
 void access_pattern_6_43()
 {
-	int i, j, col_width=4, num_access, num_miss, cache_set, cache_tag;
+	int i, col_width=4, num_access, num_miss, cache_set, cache_tag;
 	long address;
-	printf("===========================================\n");
-	printf("Cache set access pattern for N=%d\n", N);
-	printf("===========================================\n");
-	printf("\n+++++++Acess pattern for problem 6-40+++++++\n");
 	clear_cache();
 	num_access = 0;
 	num_miss = 0;
-	for (i = 15; i >= 0; i--)
+	i = 0;
+	printf("\n+++++++Acess pattern for problem 6-43+++++++\n");
+	int *iptr = (int *)buffer;
+	for(; iptr < ((int *) buffer + 640 * 480); iptr++)
 	{
-		printf("\n---------------i=%d-----------------------\n", i);
-		for (j = 15; j>=0; j--)
+		address = (long)iptr - (long)buffer;
+		cache_set = (address>>BLOCK_BITS)&SET_MASK;
+		cache_tag = (unsigned)address>>(BLOCK_BITS+SET_BITS);
+		printf("address(%ld)=[%d-0x%x] ", address, cache_set, cache_tag);
+		if (cache[cache_set] != cache_tag)
 		{
-			//if (j % col_width == 0)
-			
-			address = (long)&square[i][j].y - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].y=[%d-0x%x] ", i, j, cache_set, cache_tag);
-			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
-			if (cache[cache_set] != cache_tag)
-			{
-				num_miss++;
-				cache[cache_set] = cache_tag;
-			}
-			num_access++;
-			printf("\n");
+			num_miss++;
+			cache[cache_set] = cache_tag;
 		}
-	}
-	for (i = 15; i >= 0; i--)
-	{
-		printf("\n---------------i=%d-----------------------\n", i);
-		for (j = 15; j>=0; j--)
-		{
-			//if (j % col_width == 0)
-			
-			address = (long)&square[i][j].c - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].c=[%d-0x%x] ", i, j, cache_set, cache_tag);
-			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
-			if (cache[cache_set] != cache_tag)
-			{
-				num_miss++;
-				cache[cache_set] = cache_tag;
-			}
-			num_access++;
-			address = (long)&square[i][j].m - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].m=[%d-0x%x] ", i, j, cache_set, cache_tag);
-			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
-			if (cache[cache_set] != cache_tag)
-			{
-				num_miss++;
-				cache[cache_set] = cache_tag;
-			}
-			num_access++;
-			address = (long)&square[i][j].k - (long)square;
-			cache_set = (address>>4)&0x3F;
-			cache_tag = (unsigned)address>>10;
-			printf("square[%d][%d].k=[%d-0x%x] ", i, j, cache_set, cache_tag);
-			//printf(", cache[%d]=%d", cache_set, cache[cache_set]);
-			if (cache[cache_set] != cache_tag)
-			{
-				num_miss++;
-				cache[cache_set] = cache_tag;
-			}
-			num_access++;
+		num_access++;
+		i++;
+		if (i % col_width == 0)
 			printf("\n");
-		}
+		
 	}
 	printf("\nnum_access: %d\n", num_access);
 	printf("num_miss: %d\n", num_miss);
 	printf("num_hits: %d\n", num_access - num_miss);
-	//printf("\n================ Miss rate for 6-38: %0.2f %% ================\n", (float)(num_miss/num_access)*100);
 }
 int main(int argc, char *argv[])
 {
-	//access_pattern_6_38();
-	//access_pattern_6_39();
-	access_pattern_6_40();
+	//access_pattern_6_41();
+	//access_pattern_6_42();
+	access_pattern_6_43();
 	return 0;
 }
