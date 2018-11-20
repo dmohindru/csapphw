@@ -1,0 +1,27 @@
+Homework Problem 7-12
+--------------------
+A)
+ADDR(s) = ADDR(.text) = 0x4004e0
+and
+ADDR(r.symbol) = ADDR(swap) = 0x4004f8
+
+refaddr = ADDR(s) + r.offset
+refaddr = 0x4004e0 + 0xa
+refaddr = 0x4004ea
+
+*refptr = (unsigned) (ADDR(r.symbol) + r.addend - refaddr)
+*refptr = (unsigned) (0x4004f8 -0x4 - 0x4004ea)
+*refptr = (unsigned) (0xa)
+
+B)
+ADDR(s) = ADDR(.text) = 0x4004d0
+and
+ADDR(r.symbol) = ADDR(swap) = 0x400500
+
+refaddr = ADDR(s) + r.offset
+refaddr = 0x4004d0 + 0xa
+refaddr = 0x4004da
+
+*refptr = (unsigned) (ADDR(r.symbol) + r.addend - refaddr)
+*refptr = (unsigned) (0x400500 -0x4 - 0x4004da)
+*refptr = (unsigned) (0x22)

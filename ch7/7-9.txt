@@ -1,0 +1,6 @@
+Homework Problem 7-9
+--------------------
+main in foo6.c in a global function thus is a strong global symbol.
+where is main in bar6.c in uninitialized global symbol so it is a 
+weaker symbol than main in foo6.c. Hence in p2() function main reference to
+main() function in foo6.c

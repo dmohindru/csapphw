@@ -1,0 +1,12 @@
+Homework Problem 7-6
+--------------------
+
+Symbol		swap.o symbtab		Symbol Type		Where defined		Section
+----------------------------------------------------------------------------
+buf			yes					extern			m.o					.data		--ok--
+bufp0		yes					global			swap.o				.data		--ok--
+bufp1		yes					local			swap.o				.bss		--ok--
+swap		yes					global			swap.o				.text		--ok--
+temp		no					-----			-----				----		--ok--
+incr		yes					local			swap.o				.text		--ok--
+count		yes					local			swap.o				.bss		--ok--

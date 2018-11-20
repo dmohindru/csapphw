@@ -1,0 +1,13 @@
+Homework Problem 7-8
+--------------------
+A)
+a. REF(main.1) --> DEF(module1.main)
+b. REF(main.2) --> DEF(module2.main)
+
+B)
+a. REF(x.1) --> DEF(Rule3.Unknown)
+b. REF(x.2) --> DEF(Rule3.Unknown)
+
+C)
+a. REF(x.1) --> DEF(Rule1.Error)
+b. REF(x.2) --> DEF(Rule1.Error)

@@ -1,0 +1,5 @@
+Homework Problem 7-10
+--------------------
+A) p --> libx
+B) p --> libx --> liby --> libx
+C) p --> libx --> liby --> libx --> libz  
