@@ -1,0 +1,12 @@
+Homework Problem 8-9
+--------------------
+
+Process pair		Concurrent?
+-------------------------------
+	AB					N
+	AC					Y
+	AD					Y
+	BC					Y
+	BD					Y
+	CD					Y
+

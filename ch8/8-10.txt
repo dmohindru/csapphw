@@ -1,0 +1,6 @@
+Homework Problem 8-10
+--------------------
+
+A. execev
+B. unsetenv
+C. getenv
