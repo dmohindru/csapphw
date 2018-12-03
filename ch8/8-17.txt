@@ -1,0 +1,28 @@
+Homework Problem 8-17
+--------------------
+
+possible output
+
+P - Start
+P - 0
+C - 1
+C - Child
+C - Stop
+P - 2
+P - Stop
+-----------
+P - Start
+C - 1
+C - Child
+C - Stop
+P - 0
+P - 2
+P - Stop
+-------------
+P - Start
+C - 1
+P - 0
+C - Child
+C - Stop
+P - 2
+P - Stop

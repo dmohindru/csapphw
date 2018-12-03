@@ -1,0 +1,3 @@
+Homework Problem 8-16
+--------------------
+counter = 2
