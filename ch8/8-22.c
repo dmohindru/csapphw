@@ -1,13 +1,9 @@
 /* Homework Problem 8-22 */
-//#include <stdio.h>
-//#include <unistd.h>
 #include "csapp.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
-
 
 int mysystem(char *command)
 {
@@ -40,7 +36,14 @@ int mysystem(char *command)
 		}
 	}
 }
-int main()
+int main(int argc, char *argv)
 {
-	return 0;
+  int code;
+  code = mysystem("./exit-code");
+  printf("normal exit code: %d\n", code);
+  
+  code = mysystem("./wait-sig");
+  printf("exit caused by signal, code: %d\n", code);
+  
+  return 0;
 }
