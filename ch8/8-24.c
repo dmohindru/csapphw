@@ -1,4 +1,4 @@
-/* $begin waitpid1 */
+/* Home work problem 8-24 */
 #include "csapp.h"
 #define N 2
 
