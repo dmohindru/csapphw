@@ -36,7 +36,9 @@ typedef struct process_entry
 
 /* Global variables */
 unsigned int global_job_id; /* global variable to record number of job being generated */
-process_entry_t *global_list; /* global list to keep track of number of jobs being run */ 
+process_entry_t *global_list; /* global list to keep track of number of jobs being run */
+pid_t fg_process; 
+jmp_buf buf; /* Jump buffer used in setjmp and longjmp */
 
 /* Function prototypes */
 void eval(char *cmdline);
@@ -52,25 +54,42 @@ void do_bgfg(int fgbg); /* Function to process bg and fg command */
 void handler_sigchld(int sig)
 {
 	pid_t pid;
-	//char buf[MAXBUF];
-	//pid = waitpid(-1, NULL, 0);
-	//printf("sigchild pid=%d\n", pid);
-	while ((pid = waitpid(-1, NULL, 0)) > 0) {
-		//snprintf(buf, MAXBUF, "Handler reaped child %d\n", (int)pid); 
-		//Sio_puts(buf);
-		delete_jobs(pid);
+  printf("sigchld handler called with sig=%d\n", sig);
+  if (fg_process > 0) {
+    printf("Inside if block of sigchld handler\n");
+    printf("terminating process %d\n", fg_process);
+    delete_jobs(fg_process);
+    fg_process = -1;
+  }
+  else {
+    //while ((pid = waitpid(-1, NULL, 0)) > 0) {
+    if ((pid = waitpid(-1, NULL, 0)) > 0) {
+      printf("Inside else block of sigchld handler\n");
+      printf("terminating process %d\n", pid);
+      delete_jobs(pid);
     }
+  }
+  siglongjmp(buf, 1);
 }
 
 /* Handler for SIGINT signal */
 void handler_sigint(int sig)
 {
-	printf("Received signal for keyboad ctrl+c\n");
+  printf("Inside sigint handler\n");
+  if (fg_process > 0)
+    kill(fg_process, SIGINT);
+  siglongjmp(buf, 1);
 }
 /* Handler for SIGTSTP signal */
 void handler_sigtstp(int sig) 
 {
-	printf("Received signal for keyboard ctrl+z\n");
+  printf("Inside sigtstp handler\n");
+  if (fg_process > 0)
+  {
+    //kill(fg_process, SIGTSTP);
+    kill(fg_process, SIGSTOP);
+  }
+  siglongjmp(buf, 1);
 }
 
 int main() 
@@ -80,30 +99,23 @@ int main()
     /* Initalize global variables */
     global_job_id = 0;
     global_list = NULL;
-	/*Install signal handlers */
-	if (signal(SIGCHLD, handler_sigchld) == SIG_ERR) {
-        unix_error("SIGCHLD signal install error");
-        exit(0);
-    }
-    
-    if (signal(SIGINT, handler_sigint) == SIG_ERR) {
-        unix_error("SIGINT signal install error");
-        exit(0);
-    }
-    
-    if (signal(SIGTSTP, handler_sigtstp) == SIG_ERR) {
-        unix_error("SIGTSTP signal install error");
-        exit(0);
+    fg_process = -1;
+	
+    if (!sigsetjmp(buf, 1)) {
+        /*Install signal handlers */
+        Signal(SIGINT, handler_sigint);
+        Signal(SIGCHLD, handler_sigchld);
+        Signal(SIGTSTP, handler_sigtstp);
+        //Sio_puts("starting\n");
     }
     while (1) {
-	/* Read */
-	printf("> ");                   
-	Fgets(cmdline, MAXLINE, stdin); 
-	if (feof(stdin))
-	    exit(0);
-
-	/* Evaluate */
-	eval(cmdline);
+      /* Read */
+      printf("> ");                   
+      Fgets(cmdline, MAXLINE, stdin); 
+      if (feof(stdin))
+        exit(0);
+      /* Evaluate */
+      eval(cmdline);
     } 
 }
 /* $end shellmain */
@@ -120,11 +132,10 @@ void eval(char *cmdline)
     strcpy(buf, cmdline);
     bg = parseline(buf, argv); 
     if (argv[0] == NULL)  
-	return;   /* Ignore empty lines */
+      return;   /* Ignore empty lines */
 
     if (!builtin_command(argv)) { 
         if ((pid = Fork()) == 0) {   /* Child runs user job */
-            //printf("I am a child process %d\n", getpid());
             if (execve(argv[0], argv, environ) < 0) {
                 printf("%s: Command not found.\n", argv[0]);
                 exit(0);
@@ -132,36 +143,39 @@ void eval(char *cmdline)
         }
         /* Parent process shellex */
         else { 
-			/* Block SIGCHLD here to avoid race condition */
-			/* Bug to have add_job her like this */
-			printf("child process created by pid=%d\n", pid);
-			if (!add_job(pid, cmdline)) {
-				printf("Unable to add job to job list. Exiting....\n");
-				exit(0);
-			}
-		}
+          /* Block SIGCHLD here to avoid race condition */
+          /* Bug to have add_job her like this */
+          if (!add_job(pid, cmdline)) {
+            printf("Unable to add job to job list. Exiting....\n");
+            exit(0);
+          }
+        }
 
-		/* Parent waits for foreground job to terminate */
-		if (!bg) {
-			int status;
-			if (waitpid(pid, &status, 0) < 0)
-				unix_error("waitfg: waitpid error");
-			delete_jobs(pid);
-		}
-		else
-			printf("[%d] %d %s",global_job_id, pid, cmdline);
+      /* Parent waits for foreground job to terminate */
+      if (!bg) {
+        fg_process = pid;
+        int status;
+        if (waitpid(pid, &status, 0) < 0)
+          unix_error("waitfg: waitpid error");
+          // these two below statement are not getting executed for for ground process
+          //fg_process = -1;
+        //delete_jobs(pid);
+      }
+      else
+        printf("[%d] %d %s",global_job_id, pid, cmdline);
     }
     else { /* Process built-in commands */ 
-		if (!strcmp(argv[0], "jobs")) {
-			display_jobs();
-		}
-		else if (!strcmp(argv[0], "fg")) {
-			do_bgfg(FG);
-		}
-		else if(!strcmp(argv[0], "bg")) {
-			do_bgfg(BG);
-		}
-	}
+      if (!strcmp(argv[0], "jobs")) {
+        display_jobs();
+      }
+      else if (!strcmp(argv[0], "fg")) {
+        do_bgfg(FG);
+      }
+      else if(!strcmp(argv[0], "bg")) {
+        do_bgfg(BG);
+      }
+    }
+    
     return;
 }
 
@@ -239,6 +253,7 @@ void do_bgfg(int fgbg)
 /* Function to add jobs */
 int add_job(pid_t pid, char *cmd_line)
 {
+  printf("Adding job for pid %d\n", pid);
 	process_entry_t *jobs;
 	/* Create job entry */
 	process_entry_t *new_job = (process_entry_t *)malloc(sizeof(process_entry_t));
@@ -268,6 +283,7 @@ int add_job(pid_t pid, char *cmd_line)
 /* Function to delete jobs */
 void delete_jobs(pid_t pid)
 {
+  printf("Deleting job for pid %d\n", pid);
 	process_entry_t *jobs, *previous;
 	/* if only job in list */
 	if (global_list->next == NULL) {
@@ -299,5 +315,3 @@ void delete_jobs(pid_t pid)
 		}
 	}
 }
-
-
