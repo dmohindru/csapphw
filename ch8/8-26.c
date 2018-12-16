@@ -40,18 +40,19 @@ typedef struct process_entry
 
 /* Global variables */
 unsigned int global_job_id; /* global variable to record number of job being generated */
-process_entry_t *global_list; /* global list to keep track of number of jobs being run */
-//pid_t fg_process; 
+process_entry_t *global_list; /* global list to keep track of number of jobs being run */ 
 jmp_buf buf; /* Jump buffer used in setjmp and longjmp */
 volatile sig_atomic_t global_pid;
-
+volatile pid_t fg_process; /* for foreground process */
 /* Function prototypes */
 void eval(char *cmdline);
 int parseline(char *buf, char **argv);
 int builtin_command(char **argv);
+/* self defined functions */
 int add_job(pid_t pid, char *cmd_line); /* Function to add job to list */
 void delete_jobs(pid_t pid); /* Function to delete job from list */
-pid_t find_job(int process, int type); /* Function to find job from global list */
+process_entry_t* find_job(int process, int type); /* Function to find job from global list */
+int update_process(pid_t pid, char run_status); /* Function to update run status of a process */
 void display_jobs(); /* Function to display jobs */
 void do_bgfg(int fgbg, char *job_num); /* Function to process bg and fg command */
 
@@ -64,68 +65,59 @@ void handler_sigchld(int sig)
 	 * 3. Child is continued
 	 */
 	pid_t pid;
-	printf("sigchld handler\n");
 	/* check for terminating process */
-	while ((pid = waitpid(-1, NULL, WNOHANG)) > 0) {
-      //printf("Inside else block of sigchld handler\n");
-      printf("terminating process %d\n", pid);
-      delete_jobs(pid);
-      siglongjmp(buf, 1);
+	while ((global_pid = waitpid(-1, NULL, WNOHANG)) > 0) {
+      delete_jobs(global_pid);
+      if (fg_process > 0) {  
+		fg_process = 0;
+		siglongjmp(buf, 1);
+	  }
 	}
 	
 	/* check for stopped process */
 	while ((pid = waitpid(-1, NULL, WNOHANG|WUNTRACED)) > 0) {
-      //printf("Inside else block of sigchld handler\n");
-      printf("stopped process %d\n", pid);
-      //delete_jobs(pid);
-      siglongjmp(buf, 1);
+      if (!update_process(pid, STOPPED)) {
+		printf("Unable to update run status of process: %d\n", pid);
+		exit(0);
+	  }
+	  if (fg_process > 0) {  
+		fg_process = 0;
+		siglongjmp(buf, 1);
+	  }
 	}
 	
 	/* check for continued process */
-	while ((pid = waitpid(-1, NULL, WNOHANG|WCONTINUED)) > 0) {
-      //printf("Inside else block of sigchld handler\n");
-      printf("continued process %d\n", pid);
-      //delete_jobs(pid);
-      siglongjmp(buf, 1);
+	while ((global_pid = waitpid(-1, NULL, WNOHANG|WCONTINUED)) > 0) {
+      if (!update_process(global_pid, RUNNING)) {
+		printf("Unable to update run status of process: %d\n", pid);
+		exit(0);
+	  }
 	}
-	
-	//siglongjmp(buf, 1);
 }
 
 /* Handler for SIGINT signal */
-void handler_sigint(int sig)
+void handler_jobcontrol(int sig)
 {
-	pid_t pid;
-	sigset_t mask, prev_mask; /* Signal masks */
-	printf("Inside sigint handler\n");
-	//Sigemptyset(&mask);
-	//Sigaddset(&mask, SIGCHLD);
-	//Sigprocmask(SIG_BLOCK, &mask, &prev_mask);
-	while ((pid = waitpid(-1, NULL, WNOHANG|WUNTRACED|WCONTINUED)) > 0) {
-      printf("sigint received for process %d\n", pid);
-      kill(pid, SIGINT);
-      delete_jobs(pid);
+	//pid_t pid;
+	//printf("Inside handler_jobcontrol\n");
+	//printf("Recievied signal no: %d\n", sig);
+	if (sig == SIGINT && fg_process > 0)
+	{
+		printf("Job %d terminated by signal: Interrupt\n", fg_process);
+		kill(fg_process, SIGINT);
 	}
-	//Sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-	siglongjmp(buf, 1);
+	else if (sig == SIGTSTP && fg_process > 0)
+	{
+		printf("Job %d stopped by signal: Stopped\n", fg_process);
+		kill(fg_process, SIGTSTP);
+	}
+	else
+	{
+		//printf("No process in foreground\n");
+	}
 }
 /* Handler for SIGTSTP signal */
-void handler_sigtstp(int sig) 
-{
-  pid_t pid;
-  sigset_t mask, prev_mask; /* Signal masks */
-  printf("Inside sigtstp handler\n");
-  //Sigemptyset(&mask);
-  //Sigaddset(&mask, SIGCHLD);
-  //Sigprocmask(SIG_BLOCK, &mask, &prev_mask);
-  if ((pid = waitpid(-1, NULL, WNOHANG|WUNTRACED)) > 0) {
-      printf("sigtstp received for process %d\n", pid);
-      kill(pid, SIGTSTP);
-      //delete_jobs(pid);
-	}
-  //Sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-  siglongjmp(buf, 1);
-}
+
 
 int main() 
 {
@@ -134,14 +126,13 @@ int main()
     /* Initalize global variables */
     global_job_id = 0;
     global_list = NULL;
-   // fg_process = -1;
+    fg_process = 0;
 	
     if (!sigsetjmp(buf, 1)) {
         /*Install signal handlers */
-        Signal(SIGINT, handler_sigint);
+        Signal(SIGINT, handler_jobcontrol);
         Signal(SIGCHLD, handler_sigchld);
-        Signal(SIGTSTP, handler_sigtstp);
-        //Sio_puts("starting\n");
+        Signal(SIGTSTP, handler_jobcontrol);
     }
     while (1) {
       /* Read */
@@ -172,44 +163,36 @@ void eval(char *cmdline)
 
     if (!builtin_command(argv)) { 
         if ((pid = Fork()) == 0) {   /* Child runs user job */
+            setpgid(0, 0);
             if (execve(argv[0], argv, environ) < 0) {
                 printf("%s: Command not found.\n", argv[0]);
                 exit(0);
             }
-            /* else send some kind of signal to parent to notify
-             * of successfull execve call
-             */
         }
         /* Parent process shellex */
         else { 
-          /* Block SIGCHLD here to avoid race condition */
-          /* Bug to have add_job her like this */
-          if (!add_job(pid, cmdline)) {
-            printf("Unable to add job to job list. Exiting....\n");
-            exit(0);
-          }
-        }
-
-      /* Parent waits for foreground job to terminate */
-      if (!bg) {
-        Sigemptyset(&mask);
-        Sigaddset(&mask, SIGCHLD);
-        Sigprocmask(SIG_BLOCK, &mask, &prev_mask);
-        //fg_process = pid;
-        int status;
-        // we can block SIGCHLD here 
-        if (waitpid(pid, &status, 0) < 0)
-          unix_error("waitfg: waitpid error");
-          // these two below statement are not getting executed for for ground process
-          //fg_process = -1;
-		  delete_jobs(pid);
-		  Sigprocmask(SIG_SETMASK, &prev_mask, NULL);
-        // unblock sigchld here
-      }
-      else
-        printf("[%d] %d %s",global_job_id, pid, cmdline);
-    }
-    else { /* Process built-in commands */ 
+			
+			Sigemptyset(&mask);
+			Sigaddset(&mask, SIGCHLD);
+			Sigprocmask(SIG_BLOCK, &mask, &prev_mask);
+			if (!add_job(pid, cmdline)) {
+				printf("Unable to add job to job list. Exiting....\n");
+				exit(0);
+			}
+			/* Parent waits for foreground job to terminate */
+			if (!bg) {
+				fg_process = pid; /* Mark foreground process */
+				global_pid = 0;
+				while (!global_pid)
+					sigsuspend(&prev_mask);
+			}
+			else
+				printf("[%d] %d %s",global_job_id, pid, cmdline);
+		}
+		Sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+	}
+    /* Process built-in commands */
+    else {  
       if (!strcmp(argv[0], "jobs")) {
         display_jobs();
       }
@@ -275,31 +258,23 @@ int parseline(char *buf, char **argv)
 
 void display_jobs()
 {
-	int status, return_val;
 	process_entry_t *entry;
 	entry = global_list;
 	while(entry)
 	{
-		status = 0;
-		if(waitpid(entry->process_id, &status, WUNTRACED|WNOHANG) == -1)
-			printf("Error in getting status for process id: %d\n", entry->process_id);
-		//return_val = WIFSTOPPED(status);
-		//printf("return_val: %d\n", return_val);
-		if (WIFSTOPPED(status))
+		if (entry->run_status == STOPPED)
 			printf("[%d] %d Stopped\t %s", entry->job_id, entry->process_id, entry->cmdline);
-		else
+		else if (entry->run_status == RUNNING)
 			printf("[%d] %d Running\t %s", entry->job_id, entry->process_id, entry->cmdline);
-				
-		
 		entry = entry->next;
 	}
-	//printf("Displaying jobs\n");
 }
 
 void do_bgfg(int fgbg, char *job_num)
 {
-	int process, status;;
-	pid_t pid;
+	int process;
+	process_entry_t *job;
+	sigset_t mask, prev_mask; /* Signal masks */
 	if (!job_num)
 	{
 		printf("Please specify job/process num\n");
@@ -309,43 +284,35 @@ void do_bgfg(int fgbg, char *job_num)
 	if (job_num[0] == '%')
 	{
 		process = atoi(job_num+1);
-		//printf("Finding by job id %d\n", process);
-		if ((pid=find_job(process, JOBID)) == 0)
+		if ((job=find_job(process, JOBID)) == NULL)
 		{
 			printf("%s: No such process\n", job_num);
 			return;
 		}
-		/*else
-		{
-			printf("Found job id %d with process id %d\n", process, pid);
-			if (fgbg == BG)
-		}*/
 	}
 	else
 	{
 		process = atoi(job_num);
-		//printf("Finding by process id %d\n", process);
-		if ((pid=find_job(process, PROCESSID)) == 0)
+		if ((job=find_job(process, PROCESSID)) == NULL)
 		{
 			printf("%s: No such process\n", job_num);
 			return;
 		}
-		/*else
-		{
-			printf("Found process id %d\n", pid);
-		}*/
 	}
 	if (fgbg == BG) {
-		printf("Restarting job in background with pid=%d\n", pid);
-		printf("Some background signal handling\n");
-		kill(pid, SIGCONT);
+		printf("[%d] %d %s", job->job_id, job->process_id, job->cmdline);
+		kill(job->process_id, SIGCONT);
 	}
 	else if(fgbg == FG) {
-		printf("Restarting job in foreground with pid=%d\n", pid);
-		printf("Some foreground signal handling\n");
-        kill(pid, SIGCONT);
-        if (waitpid(pid, &status, 0) < 0)
-          unix_error("waitfg: waitpid error");
+		Sigemptyset(&mask);
+		Sigaddset(&mask, SIGCHLD);
+		Sigprocmask(SIG_BLOCK, &mask, &prev_mask);
+        fg_process = job->process_id;
+        kill(job->process_id, SIGCONT);
+        global_pid = 0;
+        while (!global_pid)
+			sigsuspend(&prev_mask);
+        Sigprocmask(SIG_SETMASK, &prev_mask, NULL);
 		
 	}
 }
@@ -353,7 +320,7 @@ void do_bgfg(int fgbg, char *job_num)
 /* Function to add jobs */
 int add_job(pid_t pid, char *cmd_line)
 {
-  printf("Adding job for pid %d\n", pid);
+  //printf("Adding job for pid %d\n", pid);
 	process_entry_t *jobs;
 	/* Create job entry */
 	process_entry_t *new_job = (process_entry_t *)malloc(sizeof(process_entry_t));
@@ -363,7 +330,6 @@ int add_job(pid_t pid, char *cmd_line)
 	new_job->job_id = global_job_id;
 	new_job->process_id = pid;
 	new_job->run_status = RUNNING;
-	//strcpy(new_job->run_status, "testing");
 	strcpy(new_job->cmdline, cmd_line);
 	new_job->next = NULL;
 	/* Triverse to end of list */
@@ -384,7 +350,6 @@ int add_job(pid_t pid, char *cmd_line)
 /* Function to delete jobs */
 void delete_jobs(pid_t pid)
 {
-  printf("Deleting job for pid %d\n", pid);
 	process_entry_t *jobs, *previous;
 	/* if only job in list */
 	if (global_list->next == NULL) {
@@ -417,25 +382,38 @@ void delete_jobs(pid_t pid)
 	}
 }
 
-pid_t find_job(int process, int type) /* Function to find job from global list */
+process_entry_t* find_job(int process, int type) /* Function to find job from global list */
 {
-	pid_t pid = 0;
 	process_entry_t *jobs = global_list;
 	while (jobs)
 	{
 		if (type == JOBID) {
 			if (jobs->job_id == process) {
-				pid = jobs->process_id;
-				break;
+				return jobs;
 			}
 		}
 		else {
 			if (jobs->process_id == process) {
-				pid = jobs->process_id;
-				break;
+				return jobs;
 			}
 		}
 		jobs = jobs->next;
 	}
-	return pid;
+	return NULL;
+}
+
+int update_process(pid_t pid, char run_status) /* Function to update run status of a process */
+{
+	process_entry_t *jobs = global_list;
+	while (jobs)
+	{
+		if (jobs->process_id == pid)
+		{
+			jobs->run_status = run_status;
+			return 1;
+		}
+		jobs = jobs->next;
+	}
+	/* Didn't find job by process id, return false */
+	return 0;
 }
