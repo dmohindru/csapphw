@@ -1,0 +1,22 @@
+Virtual Address: 0x0040
+
+1. Virtual Address Format: (14 bits)
+00000001000000
+
+2. Address translation
+VPN                 : 00000001  = 0x01 
+TLB index           : 01        = 0x01
+TLB tag             : 000000    = 0x00
+TLB hit?(Y/N)       : N
+Page fault?(Y/N)    : Y
+PPN                 : -
+
+3. Physical Address Format: (12 bits)
+-
+
+4. Physical memory reference
+Byte offset         : -
+Cache index         : -
+Cache tag           : -
+Cache hit?(Y/N)     : -
+Cache byte return   : -
