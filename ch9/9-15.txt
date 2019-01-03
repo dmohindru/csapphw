@@ -1,0 +1,9 @@
+h = header
+r = request
+p = padding
+
+Request         Block Size (Dec)        Block Header (Hex)
+malloc(4)       4(h)+4(r) = 8           0x08 | 0x1 = 0x09
+malloc(7)       4(h)+7(r)+5(p)=16       0x10 | 0x1 = 0x11 
+malloc(19)      4(h)+19(r)+1(p)=24      0x18 | 0x1 = 0x19
+malloc(22)      4(h)+22(r)+6(p)=32      0x20 | 0x1 = 0x21

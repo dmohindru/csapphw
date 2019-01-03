@@ -1,0 +1,5 @@
+Alignment       Allocated block         Free block          Min Block Size(bytes)
+Single word     Header and Footer       Header and Footer       12
+Single word     Header,but noFooter     Header and Footer       8
+Double word     Header and Footer       Header and Footer       16
+Double word     Header,but noFooter     Header and Footer       8
