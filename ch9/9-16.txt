@@ -1,5 +1,10 @@
+Minimum block size of free block would be
+Header(4 bytes) + pred_pointer(4 bytes) + succ_pointer(4 bytes) + footer (4 bytes) = 32 bytes
+So in explicit free list size of free block imposes limit on minimum block size. 
+
+
 Alignment       Allocated block         Free block          Min Block Size(bytes)
-Single word     Header and Footer       Header and Footer       12
-Single word     Header,but noFooter     Header and Footer       8
-Double word     Header and Footer       Header and Footer       16
-Double word     Header,but noFooter     Header and Footer       8
+Single word     Header and Footer       Header and Footer       32
+Single word     Header,but no Footer    Header and Footer       32
+Double word     Header and Footer       Header and Footer       32
+Double word     Header,but no Footer    Header and Footer       32
