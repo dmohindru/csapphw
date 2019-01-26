@@ -1,0 +1,3 @@
+/* Solution to practical problem 10.6 */
+
+fd2 = 4
