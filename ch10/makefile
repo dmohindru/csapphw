@@ -7,3 +7,6 @@
 
 10-8: 10-8.c csapp.o
 	gcc -o 10-8 10-8.c csapp.o -pthread
+
+10-10: 10-10.c csapp.o
+	gcc -o 10-10 10-10.c csapp.o -pthread
