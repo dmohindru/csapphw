@@ -1,0 +1,11 @@
+Input redirection operator '<' open a file and sends it contents to
+program as its input.
+
+here command ./fstatcheck 3 < foo.txt
+program fstatcheck program is getting its input from
+foo.txt which is a text content. But program does not accepts
+as input on STDIN. So its input is discarded.
+
+if (Fork() ==0)
+    dup2(0, 3);
+Execve("fstatcheck", argv, envp);
