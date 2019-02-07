@@ -8,3 +8,6 @@
 11-4: 11-4.c csapp.o
 	gcc -o hostinfo 11-4.c csapp.o -pthread
 
+tiny: tiny.c csapp.o
+	gcc -o tiny tiny.c csapp.o -pthread
+
