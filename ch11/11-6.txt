@@ -1,0 +1,28 @@
+A. Done
+B. Done
+C.
+Google Chrome browser is using HTTP/1.1 version.
+D.
+Request headers recieved
+Host: The Host request-header field specifies the Internet host and port
+      number of the resource being requested
+
+Connection: The Connection general-header field allows the sender to specify
+            options that are desired for that particular connection and MUST NOT
+            be communicated by proxies over further connections.
+
+User-Agent: The User-Agent request-header field contains information about the
+            user agent originating the request.
+
+Upgrade-Insecure-Request: Did'nt find this in RFC
+
+Accept: The Accept request-header field can be used to specify certain media
+        types which are acceptable for the response.
+
+Accept-Encoding: The Accept-Encoding request-header field is similar to Accept, but
+   restricts the content-codings (section 3.5) that are acceptable in
+   the response.
+
+Accept-Language: The Accept-Language request-header field is similar to Accept, but
+                 restricts the set of natural languages that are preferred as a
+                 response to the request.
