@@ -1,27 +1,21 @@
 /*
  * adder.c - a minimal CGI program that adds two numbers together
- * adder enhancement for homework problem 11-10
  */
 /* $begin adder */
 #include "csapp.h"
 
 int main(void) {
     char *buf, *p;
-    char part1[MAXLINE], part2[MAXLINE], arg1[MAXLINE], arg2[MAXLINE], content[MAXLINE];
+    char arg1[MAXLINE], arg2[MAXLINE], content[MAXLINE];
     int n1=0, n2=0;
 
     /* Extract the two arguments */
     if ((buf = getenv("QUERY_STRING")) != NULL) {
-    //sprintf(content, "Query_string: %s\r\n", buf);
 	p = strchr(buf, '&');
 	*p = '\0';
-	strcpy(part1, buf);
-	strcpy(part2, p+1);
-	p = strchr(part1, '=');
-    strcpy(arg1, p+1);
-    p = strchr(part2, '=');
-    strcpy(arg2, p+1);
-    n1 = atoi(arg1);
+	strcpy(arg1, buf);
+	strcpy(arg2, p+1);
+	n1 = atoi(arg1);
 	n2 = atoi(arg2);
     }
 
@@ -31,8 +25,6 @@ int main(void) {
     sprintf(content, "%sThe answer is: %d + %d = %d\r\n<p>", 
 	    content, n1, n2, n1 + n2);
     sprintf(content, "%sThanks for visiting!\r\n", content);
-    
-    
   
     /* Generate the HTTP response */
     printf("Connection: close\r\n");
