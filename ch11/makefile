@@ -26,4 +26,7 @@ tiny: tiny.c csapp.o
 11-11: 11-11.c csapp.o
 	gcc -o 11-11 11-11.c csapp.o -pthread
 
+11-12: 11-12.c csapp.o
+	gcc -o 11-12 11-12.c csapp.o -pthread
+
 
