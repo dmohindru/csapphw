@@ -11,7 +11,7 @@
 #define REQ_POST    2
 
 void doit(int fd);
-void read_requesthdrs(rio_t *rp);
+int read_requesthdrs(rio_t *rp, int method);
 int parse_uri(char *uri, char *filename, char *cgiargs);
 void serve_static(int fd, char *filename, int filesize);
 void get_filetype(char *filename, char *filetype);
@@ -62,9 +62,9 @@ int main(int argc, char **argv)
 /* $begin doit */
 void doit(int fd) 
 {
-    int is_static, request;
+    int is_static, request, content_len;
     struct stat sbuf;
-    char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
+    char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE], post_date[MAXBUF];
     char filename[MAXLINE], cgiargs[MAXLINE];
     rio_t rio;
 
@@ -74,22 +74,18 @@ void doit(int fd)
         return;
     printf("%s", buf);
     sscanf(buf, "%s %s %s", method, uri, version);       //line:netp:doit:parserequest
-    /*if (strcasecmp(method, "GET") && strcasecmp(method, "HEAD")) {                     //line:netp:doit:beginrequesterr
-        clienterror(fd, method, "501", "Not Implemented",
-                    "Tiny does not implement this method");
-        return;
-    }*/
+    
     if (!strcasecmp(method, "GET")) {
         request = REQ_GET;
-        printf("GET request\n");
+        printf("==GET request==\n");
     }
     else if (!strcasecmp(method, "HEAD")) {
         request = REQ_HEAD;
-        printf("HEAD request\n");
+        printf("==HEAD request==\n");
     }
     else if (!strcasecmp(method, "POST")) {
         request = REQ_POST;
-        printf("POST request\n");
+        printf("==POST request==\n");
     }
     else {
         clienterror(fd, method, "501", "Not Implemented",
@@ -97,11 +93,13 @@ void doit(int fd)
         return;
     }
                                                         //line:netp:doit:endrequesterr
-    read_requesthdrs(&rio);                              //line:netp:doit:readrequesthdrs
+    content_len = read_requesthdrs(&rio, request);
+    printf("Reterived content length: %d\n", content_len);                              //line:netp:doit:readrequesthdrs
+    
     //printf("Reading body\n");
     //read_requesthdrs(&rio);
     
-    if (request != REQ_GET || request != REQ_POST)
+    if (request == REQ_HEAD)
         return;
 
     /* Parse URI from GET request */
@@ -112,7 +110,7 @@ void doit(int fd)
 	return;
     }                                                    //line:netp:doit:endnotfound
 
-    if (is_static) { /* Serve static content */          
+    if (is_static && request != REQ_POST) { /* Serve static content */          
 	if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) { //line:netp:doit:readable
 	    clienterror(fd, filename, "403", "Forbidden",
 			"Tiny couldn't read the file");
@@ -121,7 +119,9 @@ void doit(int fd)
 	serve_static(fd, filename, sbuf.st_size);        //line:netp:doit:servestatic
     }
     else { /* Serve dynamic content */
-	if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) { //line:netp:doit:executable
+	Rio_readnb(&rio, cgiargs, content_len);
+    printf("==cgiargs: %s==\n", cgiargs);
+    if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) { //line:netp:doit:executable
 	    clienterror(fd, filename, "403", "Forbidden",
 			"Tiny couldn't run the CGI program");
 	    return;
@@ -135,17 +135,27 @@ void doit(int fd)
  * read_requesthdrs - read HTTP request headers
  */
 /* $begin read_requesthdrs */
-void read_requesthdrs(rio_t *rp) 
+int read_requesthdrs(rio_t *rp, int method) 
 {
-    char buf[MAXLINE];
+    char buf[MAXLINE], post_header[MAXLINE], content_len[MAXLINE];
+    int post_data_size = 0;
 
-    Rio_readlineb(rp, buf, MAXLINE);
-    printf("%s", buf);
-    while(strcmp(buf, "\r\n")) {          //line:netp:readhdrs:checkterm
-	Rio_readlineb(rp, buf, MAXLINE);
-	printf("%s", buf);
-    }
-    return;
+    do {
+        Rio_readlineb(rp, buf, MAXLINE);
+        printf("%s", buf);
+        if (method == REQ_POST)
+        {
+            sscanf(buf, "%s %s", post_header, content_len);
+            if (!strcasecmp("Content-length:", post_header))
+                post_data_size = atoi(content_len);
+            //else
+            //    printf("==Content-length: %d==\n", post_data_size);
+        }
+
+    }while(strcmp(buf, "\r\n"));
+    
+    
+    return post_data_size;
 }
 /* $end read_requesthdrs */
 
