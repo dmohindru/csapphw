@@ -1,0 +1,10 @@
+Explanation for problem 12-22
+-----------------------------
+1. Basically there is a listening fd on which server listens for incomming connection.
+2. Then there is a connected fd on which data is exchanged between server and client.
+3. There is a new connected fd for each new connection. 
+4. In original problem of select server watches only two file descriptor
+a. STDIN
+b. listening fd
+So when a connection is established by listening fd server only communicates on connected fd in a loop. 
+5. As per problem 12-22 server should read client line by line. So when client is finished sending a line its connected fd is not closed, but should be added to fd watch set of select system call. It is only closed when client send EOF. In that case the connect fd should be removed from fd watch set of select system call.  
