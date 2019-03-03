@@ -20,6 +20,12 @@ rw-weak: rw-weak.c csapp.o
 12-22: 12-22.c csapp.o
 	gcc -o 12-22 12-22.c csapp.o -pthread
 
+12-23: 12-23.c csapp.o
+	gcc -o 12-23 12-23.c csapp.o -pthread
+
+12-26: 12-26.c csapp.o
+	gcc -o 12-26 12-26.c csapp.o -pthread
+
 
 
 

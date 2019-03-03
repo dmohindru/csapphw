@@ -1,0 +1,3 @@
+rio package function are implicitly reentrant because arguments are
+passed by reference and its depends on caller not to pass arguments
+by reference of shared data object. 

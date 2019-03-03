@@ -1,0 +1,7 @@
+thread safe?
+It is thread safe because it protects its critical section with
+a mutex. 
+
+reentrant ?
+Its not a reentrant because it used static data object
+in its code and shares same mutex. 
