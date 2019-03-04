@@ -1,0 +1,2 @@
+No Dead lock
+Because thread 2 does not manuplate mutex a. It does not have effect on deadlock. Refer to progress graph.

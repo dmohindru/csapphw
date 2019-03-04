@@ -1,0 +1,9 @@
+Case 1: No deadlock. Execution passed around the boundries of deadlock
+
+Case 2: No deadlock. Execution passed around the boundries of deadlock
+
+Case 3: No deadlock. Execution passed around the boundries of deadlock
+
+Case 4: No deadlock. Execution passed around the boundries of deadlock
+
+Refer to progress graph
