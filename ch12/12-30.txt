@@ -1,0 +1,9 @@
+A.
+Thread 1: a&b, a&c
+Thread 2: b&c
+Thread 3: a&b
+
+B.
+Thread 2, Thread 3 (?)
+
+C. Keep same ordering of P(a), P(b), P(c)

@@ -26,6 +26,28 @@ rw-weak: rw-weak.c csapp.o
 12-26: 12-26.c csapp.o
 	gcc -o 12-26 12-26.c csapp.o -pthread
 
+12-31: tfgets-main.o tfgets-proc.o csapp.o
+	gcc -o 12-31 tfgets-main.o tfgets-proc.o csapp.o -pthread
+
+12-32: tfgets-main.o tfgets-select.o csapp.o
+	gcc -o 12-32 tfgets-main.o tfgets-select.o csapp.o -pthread
+
+12-33: tfgets-main.o tfgets-thread.o csapp.o
+	gcc -o 12-33 tfgets-main.o tfgets-thread.o csapp.o -pthread
+
+tfgets-main.o: tfgets-main.c
+	gcc -c tfgets-main.c
+
+tfgets-proc.o: tfgets-proc.c
+	gcc -c tfgets-proc.c
+
+tfgets-select.o: tfgets-select.c
+	gcc -c tfgets-select.c
+
+tfgets-thread.o: tfgets-thread.c
+	gcc -c tfgets-thread.c
+
+
 
 
 
