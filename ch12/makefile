@@ -47,6 +47,8 @@ tfgets-select.o: tfgets-select.c
 tfgets-thread.o: tfgets-thread.c
 	gcc -c tfgets-thread.c
 
+12-34: 12-34.c csapp.o
+	gcc -o 12-34 12-34.c csapp.o -pthread
 
 
 
