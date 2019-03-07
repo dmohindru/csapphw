@@ -4,8 +4,8 @@
 */
 #include "csapp.h"
 
-#define M           256
-#define NTHREAD     2
+#define M           2048
+#define NTHREAD     4
 
 int martix_a[M][M];             /* Matrix A for multipulication */
 int martix_b[M][M];             /* Matrix B for multipulication */
@@ -43,6 +43,14 @@ int main(int argc, char *argv[])
     sec = (end.tv_sec - start.tv_sec);
     msec = ((sec * 1000000) + end.tv_usec) - start.tv_usec;
     printf("Time spent in sequential operation: %ld.%ld secs\n", sec, msec);
+    gettimeofday(&start, NULL);
+    mult_parallel();
+    gettimeofday(&end, NULL);
+    if (!compare_result())
+        printf("Parallel multiplication failed\n");
+    sec = (end.tv_sec - start.tv_sec);
+    msec = ((sec * 1000000) + end.tv_usec) - start.tv_usec;
+    printf("Time spent in parallel operation: %ld.%ld secs\n", sec, msec);
 
     return 0;
 }
@@ -86,6 +94,51 @@ void mult_seq()
             sum = 0;
         }
     }
+}
+
+/* Function for parallel matrix multiplication */
+void mult_parallel()
+{
+    pthread_t *tid;
+    long i;
+    tid = Malloc(NTHREAD * sizeof(pthread_t));
+
+    /* Create thread for multiplication */
+    for (i = 0; i < NTHREAD; i++)
+        Pthread_create(tid+i, NULL, mult_thread, (void *)i);
+
+    /* Wait for threads to finish */
+    for (i = 0; i < NTHREAD; i++)
+        Pthread_join(tid[i], NULL);
+
+    Free(tid);
+}
+
+void *mult_thread(void *vargp)
+{
+    long row, index;
+    int sum, i, j, k, start, end;
+    index = (long)vargp;
+    row = M / NTHREAD;
+    sum = 0;
+    start = index * row;
+    end = (index * row) + row;
+
+    //printf("I am thread with i=%ld\n", index);
+
+    for (i = start; i < end ; i++)
+    {
+        for (j = 0; j < M; j++)
+        {
+            for (k = 0; k < M; k++) 
+            {
+                sum += martix_a[i][k] * martix_b[k][j];
+            }
+            martix_mul_par[i][j] = sum;
+            sum = 0;
+        }
+    }
+    return NULL;
 }
 
 /* Function to display matrix */
