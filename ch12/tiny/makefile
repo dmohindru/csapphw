@@ -1,0 +1,14 @@
+# simple make file for chapter 12
+12-35: 12-35.c csapp.o
+	gcc -o 12-35 12-35.c csapp.o -pthread
+
+12-36: 12-36.c csapp.o
+	gcc -o 12-36 12-36.c csapp.o -pthread
+
+12-37: 12-37.c csapp.o
+	gcc -o 12-37 12-37.c csapp.o -pthread
+
+
+
+
+
