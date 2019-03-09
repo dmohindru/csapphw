@@ -8,6 +8,9 @@
 12-37: 12-37.c csapp.o
 	gcc -o 12-37 12-37.c csapp.o -pthread
 
+12-38: 12-38.c csapp.o
+	gcc -o 12-38 12-38.c csapp.o -pthread
+
 
 
 

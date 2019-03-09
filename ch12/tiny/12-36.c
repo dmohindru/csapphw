@@ -5,6 +5,21 @@
  */
 #include "csapp.h"
 
+typedef struct { /* Represents a pool of connected descriptors */ //line:conc:echoservers:beginpool
+    int maxfd;        /* Largest descriptor in read_set */   
+    fd_set read_set;  /* Set of all active descriptors */
+    fd_set ready_set; /* Subset of descriptors ready for reading  */
+    int nready;       /* Number of ready descriptors from select */   
+    int maxi;         /* Highwater index into client array */
+    int clientfd[FD_SETSIZE];    /* Set of active descriptors */
+} pool; //line:conc:echoservers:endpool
+
+/* Pool related function */
+void init_pool(int listenfd, pool *p);
+void add_client(int connfd, pool *p);
+void check_clients(pool *p);
+
+/* HTTP related functions */
 void doit(int fd);
 void read_requesthdrs(rio_t *rp);
 int parse_uri(char *uri, char *filename, char *cgiargs);
@@ -16,11 +31,11 @@ void clienterror(int fd, char *cause, char *errnum,
 
 int main(int argc, char **argv) 
 {
-    int listenfd, connfd, n;
+    int listenfd, connfd;
     char hostname[MAXLINE], port[MAXLINE];
     socklen_t clientlen;
     struct sockaddr_storage clientaddr;
-    fd_set read_set, ready_set;
+    static pool pool;
 
     /* Check command line args */
     if (argc != 2) {
@@ -29,40 +44,86 @@ int main(int argc, char **argv)
     }
 
     listenfd = Open_listenfd(argv[1]);
-    FD_ZERO(&read_set);              /* Clear read set */ //line:conc:select:clearreadset
-    FD_SET(listenfd, &read_set);     /* Add listenfd to read set */ //line:conc:select:addlistenfd
+    init_pool(listenfd, &pool);
 
-    n = listenfd + 1; /* Max n for select */
+    
     while (1) {
-        ready_set = read_set;
-	    Select(n, &ready_set, NULL, NULL, NULL); //line:conc:select:select
-        if (FD_ISSET(listenfd, &ready_set)) {
+        
+	    pool.ready_set = pool.read_set;
+	    pool.nready = Select(pool.maxfd+1, &pool.ready_set, NULL, NULL, NULL);
+
+        if (FD_ISSET(listenfd, &pool.ready_set)) {
             clientlen = sizeof(clientaddr);
 	        connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen); //line:netp:tiny:accept
             Getnameinfo((SA *) &clientaddr, clientlen, hostname, MAXLINE, 
                     port, MAXLINE, 0);
             printf("Accepted connection from (%s, %s)\n", hostname, port);
-            if (connfd+1 > FD_SETSIZE) {
-                fprintf(stderr, "too many clients\n");
-                Close(connfd);
-            }
-            n = n > connfd+1 ? n : connfd+1;
-            FD_SET(connfd, &read_set);
-        }
-        int fd;
-        for (fd = listenfd+1; fd < n; fd++) {
-            if (FD_ISSET(fd, &ready_set))
-                printf("Before do it\n");
-                doit(fd);                
-                printf("After do it\n");                             
-	            Close(fd);
-                FD_CLR(fd, &read_set);                   
+            add_client(connfd, &pool);
         }
         
-	    
+        check_clients(&pool); //line:conc:echoservers:checkclients
     }
 }
 /* $end tinymain */
+
+void init_pool(int listenfd, pool *p) 
+{
+    /* Initially, there are no connected descriptors */
+    int i;
+    p->maxi = -1;                   //line:conc:echoservers:beginempty
+    for (i=0; i< FD_SETSIZE; i++)  
+	p->clientfd[i] = -1;        //line:conc:echoservers:endempty
+
+    /* Initially, listenfd is only member of select read set */
+    p->maxfd = listenfd;            //line:conc:echoservers:begininit
+    FD_ZERO(&p->read_set);
+    FD_SET(listenfd, &p->read_set); //line:conc:echoservers:endinit
+}
+/* $end init_pool */
+
+/* $begin add_client */
+void add_client(int connfd, pool *p) 
+{
+    int i;
+    p->nready--;
+    for (i = 0; i < FD_SETSIZE; i++)  /* Find an available slot */
+	if (p->clientfd[i] < 0) { 
+	    /* Add connected descriptor to the pool */
+	    p->clientfd[i] = connfd;                 //line:conc:echoservers:beginaddclient
+
+	    /* Add the descriptor to descriptor set */
+	    FD_SET(connfd, &p->read_set); //line:conc:echoservers:addconnfd
+
+	    /* Update max descriptor and pool highwater mark */
+	    if (connfd > p->maxfd) //line:conc:echoservers:beginmaxfd
+		p->maxfd = connfd; //line:conc:echoservers:endmaxfd
+	    if (i > p->maxi)       //line:conc:echoservers:beginmaxi
+		p->maxi = i;       //line:conc:echoservers:endmaxi
+	    break;
+	}
+    if (i == FD_SETSIZE) /* Couldn't find an empty slot */
+	app_error("add_client error: Too many clients");
+}
+/* $end add_client */
+
+/* $begin check_clients */
+void check_clients(pool *p) 
+{
+    int i, connfd;
+
+    for (i = 0; (i <= p->maxi) && (p->nready > 0); i++) {
+	    connfd = p->clientfd[i];
+
+	    /* If the descriptor is ready, echo a text line from it */
+	    if ((connfd > 0) && (FD_ISSET(connfd, &p->ready_set))) { 
+	        p->nready--;
+            doit(connfd);
+            Close(connfd); //line:conc:echoservers:closeconnfd
+		    FD_CLR(connfd, &p->read_set); //line:conc:echoservers:beginremove
+		    p->clientfd[i] = -1;          //line:conc:echoservers:endremove
+        }
+	}
+}
 
 /*
  * doit - handle one HTTP request/response transaction

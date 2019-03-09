@@ -13,15 +13,13 @@ void get_filetype(char *filename, char *filetype);
 void serve_dynamic(int fd, char *filename, char *cgiargs);
 void clienterror(int fd, char *cause, char *errnum, 
 		 char *shortmsg, char *longmsg);
-void *server_thread(void *vargp);
 
 int main(int argc, char **argv) 
 {
-    long listenfd, connfd;
+    int listenfd, connfd;
     char hostname[MAXLINE], port[MAXLINE];
     socklen_t clientlen;
     struct sockaddr_storage clientaddr;
-    pthread_t tid;
 
     /* Check command line args */
     if (argc != 2) {
@@ -31,26 +29,16 @@ int main(int argc, char **argv)
 
     listenfd = Open_listenfd(argv[1]);
     while (1) {
-	    clientlen = sizeof(clientaddr);
-	    connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen); //line:netp:tiny:accept
+	clientlen = sizeof(clientaddr);
+	connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen); //line:netp:tiny:accept
         Getnameinfo((SA *) &clientaddr, clientlen, hostname, MAXLINE, 
                     port, MAXLINE, 0);
         printf("Accepted connection from (%s, %s)\n", hostname, port);
-        Pthread_create(&tid, NULL, server_thread, (void *)connfd);
-        //doit(connfd);                                             //line:netp:tiny:doit
-	    //Close(connfd);                                            //line:netp:tiny:close
+	doit(connfd);                                             //line:netp:tiny:doit
+	Close(connfd);                                            //line:netp:tiny:close
     }
 }
 /* $end tinymain */
-void *server_thread(void *vargp)
-{
-    Pthread_detach(Pthread_self());
-    long connfd = (long)vargp;
-    doit(connfd);
-    Close(connfd);
-    Pthread_cancel(Pthread_self());
-
-}
 
 /*
  * doit - handle one HTTP request/response transaction
