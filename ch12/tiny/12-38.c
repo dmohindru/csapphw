@@ -6,12 +6,24 @@
 #include "csapp.h"
 #include "sbuf.h"
 
-#define NTHREADS  4
-#define SBUFSIZE  16
+#define INIT_NTHREADS       4
+#define SBUFSIZE            16
+#define MAX_THREAD          1024 
 sbuf_t sbuf; /* Shared buffer of connected descriptors */
+
+typedef struct 
+{
+    pthread_t tid;
+    sem_t mutex;
+} ithread;
+
+ithread threads[MAX_THREAD];
 
 void *server_thread(void *argp); /* Function for worker thread */
 void *server_adjust(void *argp); /* Function to adjust number of worker thread */
+
+void init();                    /* Function for few initalization stuff */
+void create_threads(int start, int end); /* Create server threads */
 
 void doit(int fd);
 void read_requesthdrs(rio_t *rp);
@@ -24,11 +36,11 @@ void clienterror(int fd, char *cause, char *errnum,
 
 int main(int argc, char **argv) 
 {
-    int listenfd, connfd, i;
+    int listenfd, connfd;
     char hostname[MAXLINE], port[MAXLINE];
     socklen_t clientlen;
     struct sockaddr_storage clientaddr;
-    pthread_t tid;
+    
 
     /* Check command line args */
     if (argc != 2) {
@@ -37,9 +49,7 @@ int main(int argc, char **argv)
     }
 
     listenfd = Open_listenfd(argv[1]);
-    sbuf_init(&sbuf, SBUFSIZE); //line:conc:pre:initsbuf
-    for (i = 0; i < NTHREADS; i++)  /* Create worker threads */ //line:conc:pre:begincreate
-	    Pthread_create(&tid, NULL, server_thread, NULL);               //line:conc:pre:endcreate
+    init();
     while (1) {
 	    clientlen = sizeof(clientaddr);
 	    connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen); //line:netp:tiny:accept
@@ -50,19 +60,57 @@ int main(int argc, char **argv)
         
     }
 }
+void init()
+{
+    pthread_t tid;
+    sbuf_init(&sbuf, SBUFSIZE); 
+    
+    /* Create worker threads */ 
+    create_threads(0, INIT_NTHREADS);
+
+    /* Create adjuster thread */
+    //Pthread_create(&tid, NULL, server_adjust, NULL);
+}
+void create_threads(int start, int end)
+{
+    int i, *id;
+    for (i = start; i < end; i++)
+    {
+        Sem_init(&threads[i].mutex, 0, 1);
+        id = (int *)Malloc(sizeof(int));
+        *id = i;
+        Pthread_create(&threads[i].tid, NULL, server_thread, (void *)id);
+    }
+}
 /* $end tinymain */
 void *server_thread(void *argp)
 {
-    Pthread_detach(pthread_self()); 
-    while (1) { 
+    //Pthread_detach(pthread_self());
+    int id = *((int*)argp);
+    Free(argp); 
+    while (1) {
+        P(&threads[id].mutex); 
 	    int connfd = sbuf_remove(&sbuf); /* Remove connfd from buffer */ //line:conc:pre:removeconnfd
 	    doit(connfd);                    /* Service client */
 	    Close(connfd);
+        V(&threads[id].mutex);
     }
 }
 
 void *server_adjust(void *arpg)
 {
+    while(1) {
+        /* If sbuf is full */
+        if (is_sbuf_full(&sbuf)) {
+
+        }
+
+        /* If sbuf is empty */
+        if (is_sbuf_empty(&sbuf)) {
+
+        }
+
+    }
     
 }
 

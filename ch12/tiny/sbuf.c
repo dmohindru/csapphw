@@ -48,5 +48,26 @@ int sbuf_remove(sbuf_t *sp)
     return item;
 }
 /* $end sbuf_remove */
-/* $end sbufc */
+/* Is buffer empty */
+int is_sbuf_empty(sbuf_t *sp)
+{
+    int e;
+    P(&sp->mutex);
+    e = sp->front == sp->rear;
+    V(&sp->mutex);
+    return e;
+
+}
+
+/* Is buffer full */
+int is_sbuf_full(sbuf_t *sp)
+{
+    int f;
+    P(&sp->mutex);
+    f = (sp->rear - sp->front) == sp->n;
+    V(&sp->mutex);
+    return f;
+
+
+}
 
