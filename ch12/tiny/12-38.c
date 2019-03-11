@@ -4,6 +4,14 @@
  *     GET method to serve static and dynamic content.
  */
 #include "csapp.h"
+#include "sbuf.h"
+
+#define NTHREADS  4
+#define SBUFSIZE  16
+sbuf_t sbuf; /* Shared buffer of connected descriptors */
+
+void *server_thread(void *argp); /* Function for worker thread */
+void *server_adjust(void *argp); /* Function to adjust number of worker thread */
 
 void doit(int fd);
 void read_requesthdrs(rio_t *rp);
@@ -16,29 +24,47 @@ void clienterror(int fd, char *cause, char *errnum,
 
 int main(int argc, char **argv) 
 {
-    int listenfd, connfd;
+    int listenfd, connfd, i;
     char hostname[MAXLINE], port[MAXLINE];
     socklen_t clientlen;
     struct sockaddr_storage clientaddr;
+    pthread_t tid;
 
     /* Check command line args */
     if (argc != 2) {
-	fprintf(stderr, "usage: %s <port>\n", argv[0]);
-	exit(1);
+	    fprintf(stderr, "usage: %s <port>\n", argv[0]);
+	    exit(1);
     }
 
     listenfd = Open_listenfd(argv[1]);
+    sbuf_init(&sbuf, SBUFSIZE); //line:conc:pre:initsbuf
+    for (i = 0; i < NTHREADS; i++)  /* Create worker threads */ //line:conc:pre:begincreate
+	    Pthread_create(&tid, NULL, server_thread, NULL);               //line:conc:pre:endcreate
     while (1) {
-	clientlen = sizeof(clientaddr);
-	connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen); //line:netp:tiny:accept
+	    clientlen = sizeof(clientaddr);
+	    connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen); //line:netp:tiny:accept
         Getnameinfo((SA *) &clientaddr, clientlen, hostname, MAXLINE, 
                     port, MAXLINE, 0);
         printf("Accepted connection from (%s, %s)\n", hostname, port);
-	doit(connfd);                                             //line:netp:tiny:doit
-	Close(connfd);                                            //line:netp:tiny:close
+	    sbuf_insert(&sbuf, connfd); /* Insert connfd in buffer */
+        
     }
 }
 /* $end tinymain */
+void *server_thread(void *argp)
+{
+    Pthread_detach(pthread_self()); 
+    while (1) { 
+	    int connfd = sbuf_remove(&sbuf); /* Remove connfd from buffer */ //line:conc:pre:removeconnfd
+	    doit(connfd);                    /* Service client */
+	    Close(connfd);
+    }
+}
+
+void *server_adjust(void *arpg)
+{
+    
+}
 
 /*
  * doit - handle one HTTP request/response transaction
