@@ -99,19 +99,39 @@ void *server_thread(void *argp)
 
 void *server_adjust(void *arpg)
 {
+    int nadjust, nthread, i;
+    nthread = INIT_NTHREADS;
     while(1) {
         /* If sbuf is full */
         if (is_sbuf_full(&sbuf)) {
-
+            if (nthread == MAX_THREAD) {
+                fprintf(stderr, "Max thread count reached\n");
+                continue;
+            }
+            nadjust = nthread * 2;
+            create_threads(nthread, nadjust);
+            nthread = nadjust;
+            continue;
         }
 
         /* If sbuf is empty */
         if (is_sbuf_empty(&sbuf)) {
+            if (nthread == INIT_NTHREADS)
+                continue;
+            
+            nadjust = nthread / 2;
+            /* Kill threads from nadjust to nthread */
+            for (i = nadjust; i < nthread; i++)
+            {
+                P(&threads[i].mutex);
+                Pthread_cancel(threads[i].tid);
+                V(&threads[i].mutex);
+            }
 
+            nthread = nadjust;
+            continue;
         }
-
     }
-    
 }
 
 /*
